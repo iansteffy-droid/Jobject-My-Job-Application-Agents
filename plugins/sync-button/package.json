@@ -1,0 +1,12 @@
+{
+  "name": "jobject-sync-button",
+  "version": "0.1.0",
+  "description": "Dashboard button that starts the Full refresh routine (sheet, CVs, documents, letters)",
+  "type": "module",
+  "private": true,
+  "paperclipPlugin": {
+    "manifest": "./dist/manifest.js",
+    "worker": "./dist/worker.js",
+    "ui": "./dist/ui/"
+  }
+}

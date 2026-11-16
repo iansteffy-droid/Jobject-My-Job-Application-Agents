@@ -1,0 +1,3 @@
+{"address": "<Street and number>, <Postcode> <City>", "lat": 0.0, "lon": 0.0,
+ "ebike": false,
+ "limits_minutes": {"3plus_days": 45, "1to2_days": 75}}

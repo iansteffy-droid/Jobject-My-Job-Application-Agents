@@ -1,0 +1,10 @@
+# Personal career data never goes into git (it lives only in these local folders):
+# documents/ = CVs, references, profile, job preferences, sender block, home address;
+# jobs/ = postings, ratings, letters. The committed blank templates are in documents.example/.
+documents/
+jobs/
+# Cloned Paperclip server; 1.7 GB with node_modules
+paperclip/
+scripts/letter/node_modules/
+__pycache__/
+plugins/*/dist/
