@@ -96,9 +96,9 @@ A stale row number or path once put one company's letter in another company's fo
 2. **Mismatch** (other company or role, ticket not found, ticket in two rows): write nothing (no sheet
    write, no card, no letter file), comment `Board decision needed: row/ticket mismatch` with both values
    (row number, row company/position, issue title, posting.json company/title), assign to the Coordinator.
-3. **Final letters:** before any hand-off with PDFs, `pdftotext <pdf> -` for every final PDF; its
-   addressee company and subject line must name posting.json's `company` and `title`. The Fact-checker
-   blocks on a mismatch.
+3. **Final letters:** before any hand-off with PDFs, run `scripts/check_final.sh JOB-N` (one command; it
+   checks every file and prints each PDF's addressee and subject). Those must name posting.json's `company`
+   and `title`. The Fact-checker blocks on a mismatch.
 4. **References:** a card or comment never cites a bare folder path as the only reference. Always name
    company + position + ticket first (e.g. "ExampleCorp – Senior Software Engineer (JOB-7)"), then the
    path from `scripts/job_dir.sh JOB-7` resolved in that same run.

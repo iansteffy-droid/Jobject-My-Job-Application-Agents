@@ -34,10 +34,11 @@ def script(rel):
 
 SHEETS_READ = ["mcp__claude_ai_Google_Sheets__get_values", "mcp__claude_ai_Google_Sheets__get_spreadsheet"]
 # update_spreadsheet: only for colouring a Company cell yellow (Coordinator instructions, SHEET.md).
-SHEETS_WRITE = ["mcp__claude_ai_Google_Sheets__update_values", "mcp__claude_ai_Google_Sheets__update_spreadsheet"]
+SHEETS_UPDATE = ["mcp__claude_ai_Google_Sheets__update_values"]
+SHEETS_WRITE = SHEETS_UPDATE + ["mcp__claude_ai_Google_Sheets__update_spreadsheet"]
 
 BASE = (["Read", "Glob", "Grep", "WebFetch", "WebSearch", f"Edit(/{J}/jobs/**)"]
-        + bash(*script("scripts/pc.sh"), *script("scripts/job_dir.sh"), "jq", "mkdir", "ls", "date", "cat", "head", "tail", "wc", "grep",
+        + bash(*script("scripts/pc.sh"), *script("scripts/job_dir.sh"), *script("scripts/check_final.sh"), "jq", "mkdir", "ls", "date", "cat", "head", "tail", "wc", "grep",
                "pdftotext", "pdfinfo")
         + SHEETS_READ)
 
@@ -51,6 +52,11 @@ ROLES = {
     "letter-writer": BASE + bash("node scripts/letter/make_letter.mjs", f"node {J}/scripts/letter/make_letter.mjs"),
     "fact-checker": BASE,
     "proofreader": BASE,
+    # Scouting team (agents/_shared/SCOUTING.md): both write only the scout tab; no colouring, so no update_spreadsheet.
+    "job-scout": BASE + SHEETS_UPDATE + bash("python3 -I scripts/scout.py", f"python3 -I {J}/scripts/scout.py",
+                                             *script("scripts/fetch_page.sh")),
+    "job-reviewer": BASE + SHEETS_UPDATE + bash("python3 -I scripts/scout.py", f"python3 -I {J}/scripts/scout.py",
+                                                "python3 -I scripts/commute.py", f"python3 -I {J}/scripts/commute.py"),
 }
 
 DENY = (bash("git push", "rm -rf")

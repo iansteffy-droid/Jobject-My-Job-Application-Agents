@@ -75,13 +75,14 @@ Keep a round counter in your comment (`Round 1`, `Round 2`).
   **coordinator** with the open points listed, so the candidate decides.
 - Both reviews passed → render once more (both drafts), confirm 1 page each, then make the
   **English versions** (below, if configured) and hand to the **coordinator** with all PDF paths.
-- **Hand-off gate:** before handing to the coordinator, run `ls <job>/final/<NameA> <job>/final/<NameB>`. Each
-  folder must contain `<Firstname>-<Lastname>-Anschreiben.pdf/.docx` and (when English versions are configured)
+- **Hand-off gate:** before handing to the coordinator, run exactly one command, `scripts/check_final.sh JOB-N`
+  (never your own `ls`/`grep`/`pdftotext` chain; chained commands with variables are denied). Each folder must
+  contain `<Firstname>-<Lastname>-Anschreiben.pdf/.docx` and (when English versions are configured)
   `<Firstname>-<Lastname>-Cover-Letter.pdf/.docx`, all 1 page, and nothing else (delete old company-named or
-  variant-named files). Also grep the four drafts for placeholders (`[`, `TODO`, `XXX`). Missing file or
-  placeholder → fix it first; never hand off incomplete. **Identity gate:** `pdftotext <pdf> -` for every final
-  PDF; the addressee company and the subject line must match posting.json `company` and `title` (German subject
-  "Bewerbung als <title>", English "Application: <title>"). A wrong company or role → fix and re-render first.
+  variant-named files). `RESULT: FAIL` → fix it first; never hand off incomplete. **Identity gate:** in the
+  script's output, every PDF's addressee company and subject line must match posting.json `company` and `title`
+  (German subject "Bewerbung als <title>", English "Application: <title>"). A wrong company or role → fix and
+  re-render first.
   The hand-off comment names company + position + ticket before the paths (WORKFLOW.md).
 
 ## English versions (when job-preferences.md §Letters asks for them)

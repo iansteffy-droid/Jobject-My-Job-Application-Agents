@@ -182,11 +182,11 @@ run in this same run, never a bare folder path.
 - **The candidate rejected:** `[Agent: Stage]` = `skipped by <name>`, set the issue `done`.
 - **A card answered on a job whose row moved to `<applied tab>` or `<rejected tab>`** (section A step 7):
   do nothing; no sheet write, no letter work.
-- **From Letter Writer with final letters:** first check the files: `ls <job>/final/<NameA> <job>/final/<NameB>` must
-  show `<Firstname>-<Lastname>-Anschreiben.pdf/.docx` and (when job-preferences.md §Letters asks for English versions)
-  `<Firstname>-<Lastname>-Cover-Letter.pdf/.docx` in **both** folders, and `grep -E '\[|TODO|XXX' <job>/drafts/*.json`
-  must find no placeholder. `pdftotext` every final PDF: addressee company and subject line must match
-  posting.json `company`/`title` (WORKFLOW.md identity check). Anything missing, a mismatch or a company-named
+- **From Letter Writer with final letters:** first run exactly one command, `scripts/check_final.sh JOB-N`
+  (never your own `ls`/`grep`/`pdftotext` chain: chained commands with variables are denied, which stopped
+  this step three times). It checks both angle folders for the German and English `.pdf`/`.docx`, 1 page each,
+  no placeholder, the company named, and prints each PDF's addressee and subject: compare those with
+  posting.json `company`/`title` (WORKFLOW.md identity check). `RESULT: FAIL`, a mismatch or a company-named
   file → assign back to **letter-writer** with the list, no card. Then `ask_user_questions`, one single-choice question
   "Which draft do you want?", options named after the two angle folders (from letter-plan.md
   `Folder A:` / `Folder B:`, e.g. `Builder`, `Leader`; never "Draft A/B"), then `Revise`, `Neither`;
