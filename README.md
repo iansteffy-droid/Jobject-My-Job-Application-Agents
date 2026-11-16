@@ -26,8 +26,8 @@ must look.
 2. Fill in every file; `documents/README.md` (copied from the example) explains each one:
    - `about-me.md`: profile, consistency facts, proof points, availability, writing preferences
    - `job-preferences.md`: your commute limits, location scores, target work, dealbreakers, bonuses,
-     salary pitch policy, letter rules, and **your sheet**: spreadsheet id, tab name, header row and
-     the column map (your header text for each column role and what agents may write)
+     salary pitch policy, letter rules, and **your sheet**: spreadsheet id, tab names (open jobs, plus
+     the read-only tabs you move applied and rejected rows into), header row and the column map (your header text for each column role and what agents may write)
    - `sender.json`: the sender block printed on every letter
    - `commute-home.json`: your home coordinates, whether you have an e-bike, and the commute limits
      in minutes (keep them in sync with `job-preferences.md` §Commute)
@@ -35,7 +35,7 @@ must look.
    `documents/certificates/`, then add plain-text transcriptions to `documents/text/` (CVs with
    numbered lines `L1`, `L2`, …) and list them in `documents/text/README.txt`, including which
    document is the main proof for your target work.
-4. Create the Google Sheet (or use yours), put its id and tab name into `job-preferences.md` §Sheet,
+4. Create the Google Sheet (or use yours), put its id and tab names into `job-preferences.md` §Sheet,
    and connect the claude.ai Google Sheets connector on the Claude account the agents use.
 5. Start the instance and provision the agents (see Running).
 

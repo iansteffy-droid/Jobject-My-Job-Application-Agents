@@ -77,8 +77,9 @@ Always use absolute paths.
 ## The job folder
 
 Each job has a folder named after the candidate's sheet: `jobs/<row>-<position>_<company>/` (e.g.
-`jobs/006-senior-software-engineer-m-f-d_examplecorp/`); jobs whose sheet row was deleted move to
-`jobs/finished/`. Folders are renamed when rows move, so **always look yours up by ticket at the
+`jobs/006-senior-software-engineer-m-f-d_examplecorp/`); jobs the candidate moved to the applied tab
+move to `jobs/applied/`, to the rejected tab to `jobs/rejected/`, and jobs whose sheet row was deleted
+to `jobs/finished/`. Folders are renamed when rows move, so **always look yours up by ticket at the
 start of a run**: `scripts/job_dir.sh JOB-7` prints the current absolute path. Never trust a folder
 path written in an older comment or description.
 

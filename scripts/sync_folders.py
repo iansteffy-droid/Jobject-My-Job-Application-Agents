@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Keep the job folders named after the job sheet: <row>-<position>_<company>, finished jobs in jobs/finished/.
+"""Keep the job folders named after the job sheet: <row>-<position>_<company>; moved/finished jobs in
+jobs/applied/, jobs/rejected/, jobs/finished/.
 
 Usage: python3 -I scripts/sync_folders.py <rows.json>
 
@@ -7,13 +8,17 @@ rows.json (written by the Coordinator from the sheet, one entry per row that has
   [{"ticket": "JOB-7", "row": 6, "position": "Senior Software Engineer (m/f/d)", "company": "ExampleCorp", "busy": false}, ...]
   busy = true while an agent is working on the issue (status in_progress): its folder is not renamed
   this time, so no agent loses its paths mid-run.
+  A job whose row the candidate moved to the applied or rejected tab gets an entry without a row:
+  {"ticket": "JOB-9", "moved": "applied"} or {"ticket": "JOB-11", "moved": "rejected"}.
 
 Each job folder holds a `.ticket` file with its issue identifier; that is how folders are matched,
 never by name. Rules:
   - folder name = <row, 3 digits>-<position slug>_<company slug>,
     e.g. 006-senior-software-engineer-m-f-d_examplecorp
+  - a "moved" entry -> folder moves to jobs/applied/ or jobs/rejected/ (also out of jobs/finished/)
   - a ticket that no longer appears in the sheet (row deleted) -> folder moves to jobs/finished/
-Prints one JSON object: {"renamed": [[ticket, old, new]...], "finished": [[ticket, old, new]...], "skipped_busy": [...]}
+Prints one JSON object: {"renamed": [[ticket, old, new]...], "applied": [...], "rejected": [...],
+"finished": [[ticket, old, new]...], "skipped_busy": [...]}
 """
 import json
 import re
@@ -24,6 +29,7 @@ from pathlib import Path
 
 JOBS = Path(__file__).resolve().parent.parent / "jobs"
 FINISHED = JOBS / "finished"
+MOVED = {"applied": JOBS / "applied", "rejected": JOBS / "rejected"}
 
 
 def slug(text, limit=60):
@@ -34,7 +40,7 @@ def slug(text, limit=60):
 
 def ticket_folders(base):
     out = {}
-    for d in sorted(p for p in base.iterdir() if p.is_dir() and p.name != "finished" and not p.name.startswith(".")):
+    for d in sorted(p for p in base.iterdir() if p.is_dir() and p.name not in ("finished", "applied", "rejected") and not p.name.startswith(".")):
         t = d / ".ticket"
         if t.exists():
             out[t.read_text().strip()] = d
@@ -52,10 +58,24 @@ def main():
     if len(sys.argv) != 2:
         print(__doc__, file=sys.stderr)
         return 2
-    rows = {r["ticket"]: r for r in json.loads(Path(sys.argv[1]).read_text())}
+    entries = json.loads(Path(sys.argv[1]).read_text())
+    moved = {r["ticket"]: r["moved"] for r in entries if r.get("moved") in MOVED}
+    rows = {r["ticket"]: r for r in entries if r["ticket"] not in moved}
     FINISHED.mkdir(exist_ok=True)
-    result = {"renamed": [], "finished": [], "skipped_busy": [], "skipped_recent": []}
-    for ticket, folder in ticket_folders(JOBS).items():
+    for d in MOVED.values():
+        d.mkdir(exist_ok=True)
+    result = {"renamed": [], "applied": [], "rejected": [], "finished": [], "skipped_busy": [], "skipped_recent": []}
+    open_folders = ticket_folders(JOBS)
+    finished_folders = ticket_folders(FINISHED)
+    for ticket, where in moved.items():
+        # The candidate moved the row on purpose: no busy/recent safety, and pull it out of finished/ too.
+        folder = open_folders.pop(ticket, None) or finished_folders.get(ticket)
+        if folder is None:
+            continue
+        dest = free_name(MOVED[where], re.sub(r"^\d{3}-", "", folder.name))
+        folder.rename(dest)
+        result[where].append([ticket, str(folder.relative_to(JOBS.parent)), str(dest.relative_to(JOBS.parent))])
+    for ticket, folder in open_folders.items():
         row = rows.get(ticket)
         if row is None:
             # Safety: a folder touched in the last 30 minutes belongs to live work (e.g. a job opened

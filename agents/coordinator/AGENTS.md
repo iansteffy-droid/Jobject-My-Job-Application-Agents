@@ -10,6 +10,8 @@ First action in every run: `scripts/pc.sh env` to see which issue woke you and w
 
 **Sheet values come from job-preferences.md §Sheet.** Below, `<tab>` = the job tab name, `<H>` = the
 header row number, `<sheetId>` = the tab's sheetId; every sheet call uses the spreadsheet id from there.
+`<applied tab>` and `<rejected tab>` = the two tabs the candidate moves rows into (same header row;
+**read-only**, SHEET.md; a tab named "none" there is simply skipped).
 
 **Columns are found by header, never by letter.** The candidate moves columns. Before any sheet work,
 read the header row (`'<tab>'!A<H>:AZ<H>`) and build the map header → column letter / 0-based index.
@@ -21,7 +23,12 @@ the sync issue naming the header.
 
 ## A. Sheet sync (the "Sync job sheet" routine wakes you hourly)
 
-1. Read `'<tab>'!A<H>:AZ` from the sheet (the first row = headers).
+1. Read `'<tab>'!A<H>:AZ` from the sheet (the first row = headers). Also read `'<applied tab>'!A<H>:AZ`
+   and `'<rejected tab>'!A<H>:AZ` and build a header map for each (`<rejected tab>` has a different
+   column order; find `Agent: Ticket` and `URL` by header there too). Those two tabs are **read-only**:
+   never write, colour, sort or reformat any cell in them. The candidate moves a job's row out of
+   `<tab>` once they applied or dropped it, so `<tab>` holds only open jobs: a new row there (e.g. a new
+   row 4) is a new open job for the normal pipeline.
 2. Ensure the agent headers exist in the header row (exact text from SHEET.md).
 3. **Candidates:** rows where `[URL]` holds an `http` URL, `[Agent: Ticket]` is empty, and
    `[Date Applied]` is empty. Skip rows whose URL already has an issue
@@ -85,17 +92,36 @@ the sync issue naming the header.
    c. Sort with `update_spreadsheet`: one `sortRange` request, range `{sheetId: <sheetId>, startRowIndex: <H>,
       endRowIndex: <last content row>, startColumnIndex: 0, endColumnIndex: <the sheet's columnCount>}`,
       sortSpecs `[{dimensionIndex: <index of [Agent: Sort key]>, sortOrder: "ASCENDING"}]`. This moves whole rows intact (the candidate's columns,
-      colours and links stay with their job). The candidate asked for this; it is the only reordering you do.
+      colours and links stay with their job). The candidate asked for this; it is the only reordering you do,
+      and only in `<tab>` (never sort `<applied tab>` or `<rejected tab>`).
    d. Re-read `[Agent: Ticket]`, `[Position]` and `[Company]` afterwards: the row numbers have changed.
 7. **Folder order:** write `jobs/.api/rows.json` (Write tool) with one entry per sheet row that has a
    ticket in `[Agent: Ticket]`: `{"ticket": "JOB-7", "row": 6, "position": "<[Position]>", "company": "<[Company]>",
-   "busy": <true if the issue is in_progress>}`. Then run `python3 -I scripts/sync_folders.py /home/ian/Documents/code/job-hunt/jobs/.api/rows.json`.
-   It renames folders to match the current rows and moves folders of deleted rows to `jobs/finished/`.
+   "busy": <true if the issue is in_progress>}`.
+   **Rows moved to the other tabs (the candidate's rule).** A ticket with a folder directly in `jobs/` or an
+   open job issue that is no longer in `<tab>`'s `[Agent: Ticket]`: look it up in `<applied tab>`, then
+   `<rejected tab>` (by `Agent: Ticket`, else by `URL` without the query string) before treating the row as
+   deleted. A job may sit in both tabs or twice; `<applied tab>` wins (mention it in the sync summary).
+   - **In `<applied tab>`** (the candidate applied or is interviewing): cancel every pending card on the issue
+     (`scripts/pc.sh POST /api/issues/<id>/interactions/<interactionId>/cancel '{"reason": "Moved to Applied or interviewing by the candidate"}'`;
+     if Paperclip refuses it as board-only, leave the card, the closed issue makes it moot), comment
+     "Moved to Applied or interviewing by the candidate", set the issue `done`, and add
+     `{"ticket": "JOB-7", "moved": "applied"}` to rows.json (folder → `jobs/applied/`). Never start or
+     continue letter work for it.
+   - **In `<rejected tab>`** (rejected or won't apply): same card handling, comment "Moved to rejected or
+     wont apply by the candidate", set the issue `cancelled`, add `{"ticket": "JOB-7", "moved": "rejected"}`
+     (folder → `jobs/rejected/`). No further work.
+   - An issue already `done` or `cancelled` keeps its status (comment and folder move only).
+   - **In neither tab:** the row was deleted (below).
+   Then run `python3 -I scripts/sync_folders.py /home/ian/Documents/code/job-hunt/jobs/.api/rows.json`.
+   It renames folders to match the current rows, moves `moved` entries to `jobs/applied/` or
+   `jobs/rejected/`, and folders of deleted rows to `jobs/finished/`.
    Also, for rows with a ticket whose folder has `posting.json`: fill empty `[Location]`, `[Languages]`,
-   `[Work mode]` cells from it (only empty ones here; corrections happen at the Fit Scorer handoff).
-   If a ticket's row was deleted and its issue is still open, set the issue `cancelled` with the
-   comment "Row deleted from the sheet by <name>; folder moved to jobs/finished/".
-8. **Stuck-job check.** List the open job issues assigned to you
+   `[Work mode]` cells from it (only empty ones here, only in `<tab>`; corrections happen at the Fit Scorer handoff).
+   If a ticket's row was deleted (in none of the three tabs) and its issue is still open, set the issue
+   `cancelled` with the comment "Row deleted from the sheet by <name>; folder moved to jobs/finished/".
+8. **Stuck-job check.** Skip jobs found in `<applied tab>` or `<rejected tab>` (step 7): never re-route
+   or carry on their work. List the open job issues assigned to you
    (`scripts/pc.sh GET "/api/companies/<companyId>/issues?limit=200" | jq -r '.[] | select(.assigneeAgentId=="<your id>" and (.status=="in_review" or .status=="blocked")) | "\(.identifier) \(.id) \(.status)"'`).
    For each, check its interactions (`GET /api/issues/<id>/interactions`). If nothing is pending but
    the candidate has already answered the latest card (accepted, rejected or chose a draft), the answer was never
@@ -110,7 +136,7 @@ the sync issue naming the header.
    next agent yourself instead. A job blocked twice in a row for the same step: post
    `Board decision needed:` on it. Also make `[Agent: Stage]` match the
    issue (a pending draft-choice card = `waiting for <name>`; with a letter agent = `writing letter`).
-9. Close the sync issue with a one-line summary ("opened JOB-14, JOB-15; renamed 2 folders; 12 rows waiting; re-routed JOB-26").
+9. Close the sync issue with a one-line summary ("opened JOB-14, JOB-15; renamed 2 folders; JOB-9 applied; JOB-11 rejected; 12 rows waiting; re-routed JOB-26").
 
 ## B. Routing (a job issue is assigned to you)
 
@@ -147,6 +173,8 @@ Read the latest comments to see who handed it to you and why.
 - **The candidate accepted the letter question:** `[Agent: Stage]` = `writing letter`, assign to
   **researcher** (letter research), comment "<name> approved, letter research then letter".
 - **The candidate rejected:** `[Agent: Stage]` = `skipped by <name>`, set the issue `done`.
+- **A card answered on a job whose row moved to `<applied tab>` or `<rejected tab>`** (section A step 7):
+  do nothing; no sheet write, no letter work.
 - **From Letter Writer with final letters:** first check the files: `ls <job>/final/<NameA> <job>/final/<NameB>` must
   show `<Firstname>-<Lastname>-Anschreiben.pdf/.docx` and (when job-preferences.md §Letters asks for English versions)
   `<Firstname>-<Lastname>-Cover-Letter.pdf/.docx` in **both** folders, and `grep -E '\[|TODO|XXX' <job>/drafts/*.json`
@@ -219,8 +247,8 @@ agent run crashed or timed out. When such an issue is assigned to you:
 ## E. Full refresh (the "Full refresh" routine: the candidate pressed "Sync now" on the Dashboard)
 
 The candidate wants everything checked against their current sheet and documents.
-1. Run section A completely: new rows, yellow/white and red colours, deleted rows, Fit sort, folders,
-   empty Location / Languages / Work mode.
+1. Run section A completely: new rows, yellow/white and red colours, rows moved to `<applied tab>` /
+   `<rejected tab>`, deleted rows, Fit sort, folders, empty Location / Languages / Work mode.
 2. **Documents check.** List the candidate's documents with modification times:
    `ls -la --time-style=+%F_%T documents documents/text documents/cv`. Compare with the timestamp in
    `jobs/.last-full-refresh` (missing file = treat every document as changed). If nothing changed, skip
@@ -242,6 +270,7 @@ The candidate wants everything checked against their current sheet and documents
 
 - Before every sheet write, re-read the header row (columns may have moved), look the row up again by
   `[URL]`, and check again that its `[Company]`/`[Position]` cells are not red.
+- Sheet writes go only to `<tab>`. `<applied tab>` and `<rejected tab>` are read-only.
 - Write only the agent columns (headers starting with `Agent:`; SHEET.md). Never comment on or correct
   the candidate's own columns (the only exceptions: the yellow background of the `[Company]` cell, the Fit sort that moves whole
   rows, filling/correcting `[Location]`, `[Languages]`, `[Work mode]` from the posting, and the

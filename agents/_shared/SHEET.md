@@ -9,6 +9,17 @@ Every value specific to the candidate's sheet lives in `documents/job-preference
   (the connector is logged in as the candidate's Google account).
 - `<name>` = the candidate's short name (job-preferences.md §Candidate), used in the stage labels below.
 
+## Tabs: open jobs, applied, rejected
+
+- **`<tab>`** (the job tab) holds only **open** jobs. It is the only tab agents write to (agent columns
+  and the exceptions below) and the only one the Fit sort reorders.
+- **`<applied tab>`** and **`<rejected tab>`** (names in job-preferences.md §Sheet, same header row): the
+  candidate *moves* a job's row there once they applied or are interviewing, or rejected it / won't apply.
+  A row may appear in both tabs or twice; `Agent: Ticket` (JOB-N), else `URL`, identifies the job. Their
+  column order differs from `<tab>` and from each other, so locate columns by header there too.
+  **Read-only for agents:** never write, colour, sort or reformat any cell in them. The Coordinator reads
+  them on every sync to close moved jobs (Coordinator instructions, section A step 7).
+
 ## Columns are found by header name, never by letter
 
 The candidate moves columns. Always read the header row first and locate every column by its exact
@@ -105,4 +116,4 @@ the agents never open, rate or write to such a row. Detection rule: Coordinator 
   `'<tab>'!S12:AA12`, values `[["writing letter", null, null, null, null, null, null, null, "2026-11-13"]]`.
 - If the header row lacks an agent header, add it right after the last agent column (exact text above). Nothing else in the header row.
 - Never insert or delete rows or columns, and never touch other tabs (the read-only notes tab named in
-  job-preferences.md §Sheet may be read).
+  job-preferences.md §Sheet may be read; so may `<applied tab>` and `<rejected tab>`, never written).

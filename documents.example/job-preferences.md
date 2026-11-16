@@ -125,6 +125,8 @@ names the pitch from the job's `salary.md`; without salary.md the sentence is le
 - **Job tab:** `<tab name>` (sheetId `<number after #gid= in the tab URL; the first tab is usually 0>`).
   Access through the `mcp__claude_ai_Google_Sheets__*` tools (connector logged in as your Google account).
 - **Header row:** **<row number, e.g. 1>** <!-- rows above it, if any, are ignored -->. Data starts in the next row.
+- **Applied tab (read-only):** `<tab name>` or none <!-- you move a job's row here from the job tab once you applied or are interviewing; same header row -->
+- **Rejected tab (read-only):** `<tab name>` or none <!-- you move a job's row here when you rejected it or won't apply; same header row; its column order may differ, agents find columns by header -->
 - **Notes tab (read-only, Letter Strategist):** `<tab name>` or none <!-- notes from earlier applications -->
 - **Agent columns:** today `<first letter>`–`<last letter>` (headers starting with `Agent:`, right of
   your columns; the Coordinator adds the headers on its first sync, see agents/_shared/SHEET.md).

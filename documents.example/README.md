@@ -44,3 +44,6 @@ existing letters re-checked against it.
 3. Connect the claude.ai Google Sheets connector (logged in as your Google account) on the Claude
    account the agents use. On its first sync the Coordinator adds the `Agent: …` columns right of
    yours (contract: `agents/_shared/SHEET.md`).
+4. Optional: two more tabs you move rows into from the job tab, one for jobs you applied to (or are
+   interviewing for) and one for jobs you rejected or won't apply to. Agents only read them; the next sync
+   closes the moved job and files its folder under `jobs/applied/` or `jobs/rejected/`.
