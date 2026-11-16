@@ -76,12 +76,32 @@ Always use absolute paths.
 
 ## The job folder
 
-Each job has a folder named after the candidate's sheet: `jobs/<row>-<position>_<company>/` (e.g.
-`jobs/006-senior-software-engineer-m-f-d_examplecorp/`); jobs the candidate moved to the applied tab
-move to `jobs/applied/`, to the rejected tab to `jobs/rejected/`, and jobs whose sheet row was deleted
-to `jobs/finished/`. Folders are renamed when rows move, so **always look yours up by ticket at the
-start of a run**: `scripts/job_dir.sh JOB-7` prints the current absolute path. Never trust a folder
-path written in an older comment or description.
+Each job has a folder `jobs/<company>_<position>/` (e.g. `jobs/examplecorp_senior-software-engineer-m-f-d/`;
+`-JOB-N` appended when the same company + position exists twice). It has no row number and keeps its
+name when rows move; the `.ticket` file inside (e.g. `JOB-7`) is the source of truth. Jobs the candidate
+moved to the applied tab move to `jobs/applied/`, to the rejected tab to `jobs/rejected/`, and jobs
+whose sheet row was deleted to `jobs/finished/`; a changed company or position text renames the folder.
+So **always look yours up by ticket in the same run**: `scripts/job_dir.sh JOB-7` prints the current
+absolute path. Never trust a folder path written in an older comment or description.
+
+## Identity check before every write (mandatory, every agent)
+
+A stale row number or path once put one company's letter in another company's folder. So:
+1. **At the start of a run and again right before any sheet write or card**, find the job's *current*
+   row by `[Agent: Ticket]` = the issue identifier in a fresh read of the sheet (never a row number from a
+   comment, the description, an earlier `rows.json` or memory), and check that the row's `[Company]` and
+   `[Position]` match the issue title (`<Company> — <Position>`) and `posting.json` (`company`, `title`;
+   legal-form suffixes, gender tags and minor wording may differ, a different employer or role may not).
+   Agents without sheet access check the issue title against `posting.json`.
+2. **Mismatch** (other company or role, ticket not found, ticket in two rows): write nothing (no sheet
+   write, no card, no letter file), comment `Board decision needed: row/ticket mismatch` with both values
+   (row number, row company/position, issue title, posting.json company/title), assign to the Coordinator.
+3. **Final letters:** before any hand-off with PDFs, `pdftotext <pdf> -` for every final PDF; its
+   addressee company and subject line must name posting.json's `company` and `title`. The Fact-checker
+   blocks on a mismatch.
+4. **References:** a card or comment never cites a bare folder path as the only reference. Always name
+   company + position + ticket first (e.g. "ExampleCorp – Senior Software Engineer (JOB-7)"), then the
+   path from `scripts/job_dir.sh JOB-7` resolved in that same run.
 
 | File | Written by | Content |
 |---|---|---|

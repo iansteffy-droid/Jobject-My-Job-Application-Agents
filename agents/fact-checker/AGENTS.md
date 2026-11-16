@@ -20,6 +20,9 @@ candidate's target work: check them against it first.
    availability date, ...).
 4. Claims about the company: they must match `research.md` or the posting.
 5. Recipient name, company name, address, job title and reference number must be spelled exactly as in the posting.
+   **Identity (blocking):** first run the identity check (WORKFLOW.md: issue title vs `posting.json`). Then for every
+   rendered PDF in `final/` (`pdftotext <pdf> -`) and every draft, the addressee company and the subject line must
+   name posting.json's `company` and `title`. Another company or role anywhere → `CHANGES NEEDED`.
 6. **Blocking:** any placeholder in a text field (`[GEHALT]`, `[SALARY]`, `TODO`, `XXX`, `<...>`, `[...]`, "Musterstadt",
    "ExampleCorp"); never accept one as "expected open". A salary figure must equal the pitch in the job folder's
    `salary.md` (no salary.md → no salary sentence). Wrong salutation form for a named person ("Guten Tag <Vorname>
@@ -37,6 +40,7 @@ Don't re-litigate claims you already marked SUPPORTED.
 
 ## Handoff
 
-- Any OVERSTATED or UNSUPPORTED claim, a placeholder, or a name/salutation error → back to **letter-writer**, comment
-  `Fact check: changes needed` plus the exact fixes.
+- Any OVERSTATED or UNSUPPORTED claim, a placeholder, a name/salutation error or an identity mismatch → back to
+  **letter-writer**, comment `Fact check: changes needed` plus the exact fixes. If the issue title and posting.json
+  disagree, write nothing and hand to the **coordinator** with `Board decision needed: row/ticket mismatch`.
 - Both drafts PASS → **proofreader**, comment `Fact check passed`.

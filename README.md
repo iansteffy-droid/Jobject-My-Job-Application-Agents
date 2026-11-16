@@ -86,7 +86,7 @@ The three dealbreakers, and nothing stricter (the values come from `documents/jo
 - **Unstable company:** only on concrete evidence (insolvency, restructuring proceedings, acute money
   trouble). Layoffs alone are a watch flag, not a rejection.
 
-Letters land in `jobs/<row>-<position>_<company>/final/<Angle>/`, one folder per angle named after
+Letters land in `jobs/<company>_<position>/final/<Angle>/`, one folder per angle named after
 how it presents the candidate (e.g. `final/Builder/`, `final/Leader/`), each with
 `<Firstname>-<Lastname>-Anschreiben` (German) and, if configured, `<Firstname>-<Lastname>-Cover-Letter` (English) as `.pdf` and
 `.docx`, named after the candidate (`documents/sender.json`). File names never carry the company, a variant letter or a
@@ -113,7 +113,7 @@ templates/          Paperclip instance config
 plugins/            Dashboard "Sync now" button
 documents.example/  blank templates of every personal file, committed: copy to documents/
 documents/          PERSONAL: CVs, references, profile, job preferences, sender block   (gitignored)
-jobs/               one folder per job: <sheet row>-<position>_<company>/            (gitignored)
+jobs/               one folder per job: <company>_<position>/ (+ .ticket)             (gitignored)
 paperclip/          copy of the Paperclip server                                       (gitignored)
 ```
 

@@ -86,7 +86,7 @@ the header row (exact text):
 
 **Row order (the candidate's rule):** on every sync the Coordinator sorts the rows by Fit, highest
 first, then unscored, yellow, rejected/closed, red, rows without URL, empty rows. Whole rows move; job
-folder numbers follow the new row numbers.
+folders keep their names (they carry no row number), so row numbers are valid only within one read.
 
 ## Yellow rows
 
@@ -106,6 +106,8 @@ the agents never open, rate or write to such a row. Detection rule: Coordinator 
 - **Find the row by URL every time** (search the `[URL]` column); never cache row numbers, because the
   candidate sorts and inserts rows. Row number = `<H>` + index in the `A<H>:AZ` result (the header row
   itself is index 0). If the URL appears twice, use the first match and mention it in the sync summary.
+  For a row that already has a ticket, find it by `[Agent: Ticket]` and run the identity check
+  (WORKFLOW.md) before writing: `[Company]`/`[Position]` must match the issue and posting.json.
 - **Never comment on, correct or suggest changes to the candidate's columns**, except filling/correcting
   `[Location]`, `[Languages]` and `[Work mode]` from the posting (section above). Everything else the
   agents write goes into the agent columns and is about the job posting itself.

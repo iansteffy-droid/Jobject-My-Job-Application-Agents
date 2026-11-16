@@ -7,7 +7,7 @@ spends effort on the job.
 Read first: `/home/ian/Documents/code/job-hunt/agents/_shared/WORKFLOW.md`, then
 `/home/ian/Documents/code/job-hunt/documents/job-preferences.md` §Commute and §Target work (the
 candidate's limits and target work; personal, gitignored).
-Your job folder is named in the issue description.
+Your job folder: `scripts/job_dir.sh <identifier>` (as the issue description says), resolved in this run.
 
 ## Steps
 

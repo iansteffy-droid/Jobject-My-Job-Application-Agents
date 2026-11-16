@@ -45,7 +45,9 @@ Attachments: German "Lebenslauf", "Arbeitszeugnisse", "Zertifikate"; English "CV
 
 ## Render before every review
 
-All paths absolute; get the job folder with `scripts/job_dir.sh <identifier>`.
+All paths absolute; get the job folder with `scripts/job_dir.sh <identifier>` in this run. First run the
+identity check (WORKFLOW.md): issue title and `posting.json` name the same company and role; mismatch → write
+no file, comment `Board decision needed: row/ticket mismatch`, hand to the **coordinator**.
 1. `mkdir -p <job>/final`
 2. Take the two folder names from letter-plan.md (`Folder A: <NameA>`, `Folder B: <NameB>`, e.g.
    `Builder` and `Leader`). `mkdir -p <job>/final/<NameA> <job>/final/<NameB>`, then
@@ -77,7 +79,10 @@ Keep a round counter in your comment (`Round 1`, `Round 2`).
   folder must contain `<Firstname>-<Lastname>-Anschreiben.pdf/.docx` and (when English versions are configured)
   `<Firstname>-<Lastname>-Cover-Letter.pdf/.docx`, all 1 page, and nothing else (delete old company-named or
   variant-named files). Also grep the four drafts for placeholders (`[`, `TODO`, `XXX`). Missing file or
-  placeholder → fix it first; never hand off incomplete.
+  placeholder → fix it first; never hand off incomplete. **Identity gate:** `pdftotext <pdf> -` for every final
+  PDF; the addressee company and the subject line must match posting.json `company` and `title` (German subject
+  "Bewerbung als <title>", English "Application: <title>"). A wrong company or role → fix and re-render first.
+  The hand-off comment names company + position + ticket before the paths (WORKFLOW.md).
 
 ## English versions (when job-preferences.md §Letters asks for them)
 

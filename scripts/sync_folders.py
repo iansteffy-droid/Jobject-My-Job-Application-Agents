@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Keep the job folders named after the job sheet: <row>-<position>_<company>; moved/finished jobs in
-jobs/applied/, jobs/rejected/, jobs/finished/.
+"""Keep the job folders in step with the job sheet: open jobs in jobs/<company>_<position>/, moved or
+finished jobs in jobs/applied/, jobs/rejected/, jobs/finished/.
 
 Usage: python3 -I scripts/sync_folders.py <rows.json>
 
@@ -13,12 +13,15 @@ rows.json (written by the Coordinator from the sheet, one entry per row that has
 
 Each job folder holds a `.ticket` file with its issue identifier; that is how folders are matched,
 never by name. Rules:
-  - folder name = <row, 3 digits>-<position slug>_<company slug>,
-    e.g. 006-senior-software-engineer-m-f-d_examplecorp
+  - folder name = <company slug>_<position slug>, e.g. examplecorp_senior-software-engineer-m-f-d.
+    It carries no row number and stays the same for the life of the job: moving or sorting rows never
+    renames a folder. Only a change of the company or position text itself renames it.
+  - name collision (same company + position twice, e.g. a duplicate row) -> append -JOB-N
   - a "moved" entry -> folder moves to jobs/applied/ or jobs/rejected/ (also out of jobs/finished/)
   - a ticket that no longer appears in the sheet (row deleted) -> folder moves to jobs/finished/
+  - a folder is never moved onto an existing one
 Prints one JSON object: {"renamed": [[ticket, old, new]...], "applied": [...], "rejected": [...],
-"finished": [[ticket, old, new]...], "skipped_busy": [...]}
+"finished": [[ticket, old, new]...], "skipped_busy": [...], "skipped_recent": [...]}
 """
 import json
 import re
@@ -30,12 +33,17 @@ from pathlib import Path
 JOBS = Path(__file__).resolve().parent.parent / "jobs"
 FINISHED = JOBS / "finished"
 MOVED = {"applied": JOBS / "applied", "rejected": JOBS / "rejected"}
+LEGACY_ROW = re.compile(r"^\d{3}-")  # old <row>-<position>_<company> names
 
 
 def slug(text, limit=60):
     text = text.lower().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("ß", "ss")
     text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
     return re.sub(r"[^a-z0-9]+", "-", text).strip("-")[:limit].strip("-") or "job"
+
+
+def folder_name(company, position):
+    return f"{slug(company or '', 25)}_{slug(position or '', 50)}".strip("_")
 
 
 def ticket_folders(base):
@@ -47,11 +55,12 @@ def ticket_folders(base):
     return out
 
 
-def free_name(base, name, current=None):
-    cand, n = base / name, 2
-    while cand.exists() and cand != current:
-        cand, n = base / f"{name}-{n}", n + 1
-    return cand
+def free_name(base, name, ticket, current=None):
+    """base/name, or base/name-JOB-N if another folder holds that name; never an existing folder."""
+    for cand in [base / name, base / f"{name}-{ticket}"] + [base / f"{name}-{ticket}-{n}" for n in range(2, 100)]:
+        if cand == current or not cand.exists():
+            return cand
+    raise SystemExit(f"no free folder name for {ticket} in {base}")
 
 
 def main():
@@ -67,14 +76,16 @@ def main():
     result = {"renamed": [], "applied": [], "rejected": [], "finished": [], "skipped_busy": [], "skipped_recent": []}
     open_folders = ticket_folders(JOBS)
     finished_folders = ticket_folders(FINISHED)
+
+    def move(ticket, folder, dest, key):
+        folder.rename(dest)
+        result[key].append([ticket, str(folder.relative_to(JOBS.parent)), str(dest.relative_to(JOBS.parent))])
+
     for ticket, where in moved.items():
         # The candidate moved the row on purpose: no busy/recent safety, and pull it out of finished/ too.
         folder = open_folders.pop(ticket, None) or finished_folders.get(ticket)
-        if folder is None:
-            continue
-        dest = free_name(MOVED[where], re.sub(r"^\d{3}-", "", folder.name))
-        folder.rename(dest)
-        result[where].append([ticket, str(folder.relative_to(JOBS.parent)), str(dest.relative_to(JOBS.parent))])
+        if folder is not None:
+            move(ticket, folder, free_name(MOVED[where], LEGACY_ROW.sub("", folder.name), ticket), where)
     for ticket, folder in open_folders.items():
         row = rows.get(ticket)
         if row is None:
@@ -84,21 +95,17 @@ def main():
             if time.time() - newest < 1800:
                 result["skipped_recent"].append(ticket)
                 continue
-            # The row number means nothing once the row is gone: keep only the position part.
-            dest = free_name(FINISHED, re.sub(r"^\d{3}-", "", folder.name))
-            folder.rename(dest)
-            result["finished"].append([ticket, str(folder.relative_to(JOBS.parent)), str(dest.relative_to(JOBS.parent))])
+            move(ticket, folder, free_name(FINISHED, LEGACY_ROW.sub("", folder.name), ticket), "finished")
             continue
-        want = f"{int(row['row']):03d}-{slug(row['position'], 50)}_{slug(row.get('company', ''), 25)}".rstrip("_")
-        if folder.name == want:
-            continue
+        want = folder_name(row.get("company"), row.get("position"))
+        if folder.name in (want, f"{want}-{ticket}"):
+            continue  # same company + position text: the folder keeps its name, whatever the row number
         if row.get("busy"):
             result["skipped_busy"].append(ticket)
             continue
-        dest = free_name(JOBS, want, current=folder)
+        dest = free_name(JOBS, want, ticket, current=folder)
         if dest != folder:
-            folder.rename(dest)
-            result["renamed"].append([ticket, str(folder.relative_to(JOBS.parent)), str(dest.relative_to(JOBS.parent))])
+            move(ticket, folder, dest, "renamed")
     print(json.dumps(result, ensure_ascii=False))
     return 0
 

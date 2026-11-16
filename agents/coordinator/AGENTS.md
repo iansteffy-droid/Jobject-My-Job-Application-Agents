@@ -63,19 +63,19 @@ the sync issue naming the header.
    Job issues waiting in status `backlog` (added from the candidate's URL list while the limit was reached) go
    first: set them `todo` (assignee intake) before opening issues for new rows.
 5. For each new job:
-   - folder name = `<row, 3 digits>-<position slug>_<company slug>` (the candidate's rule: ordered like
-     their sheet, job position first, then the company). Slugs: lowercase ASCII, umlauts transliterated
-     (ä→ae, ß→ss), non-alphanumerics → `-`; position (`[Position]`) max 50 chars, company (`[Company]`)
-     max 25. Example: row 6, "Senior Software Engineer (m/f/d)", "ExampleCorp" →
-     `006-senior-software-engineer-m-f-d_examplecorp`.
-   - create `jobs/<name>/.api/` (mkdir, absolute path), create the issue (next bullet), then write the
-     issue identifier into `jobs/<name>/.ticket` (Write tool, content e.g. `JOB-18`).
    - create an issue: title `<Company> — <Position>`, description with **only**: the URL (`[URL]`),
      company, position, location (`[Location]`), and the line "Job folder: run scripts/job_dir.sh <identifier>". Never copy the candidate's other columns
      (their own score, notes, cons, salary notes) into the issue; they are private notes.
      Assigned to **intake**, status `todo`.
+   - folder name = `<company slug>_<position slug>`, no row number (stable for the life of the job). Slugs:
+     lowercase ASCII, umlauts transliterated (ä→ae, ß→ss), non-alphanumerics → `-`; company (`[Company]`)
+     max 25 chars, position (`[Position]`) max 50. Example: "ExampleCorp", "Senior Software Engineer (m/f/d)" →
+     `examplecorp_senior-software-engineer-m-f-d`. If `jobs/<name>` already exists (`ls`), use
+     `<name>-<identifier>` (e.g. `…-m-f-d-JOB-18`); never write into another job's folder.
+   - create `jobs/<name>/.api/` (mkdir, absolute path), then write the issue identifier into
+     `jobs/<name>/.ticket` (Write tool, content e.g. `JOB-18`).
    - write `[Agent: Ticket]` = identifier, `[Agent: Stage]` = `queued`, `[Agent: Updated]` = today to the row.
-6. **Sort the sheet by Fit** (the candidate's rule; the job folders follow the row numbers in step 7).
+6. **Sort the sheet by Fit** (the candidate's rule; job folders keep their names, row numbers change).
    a. Re-read `'<tab>'!A<H>:AZ` and the `[Company]` colours. For every visible row from the first data
       row down to the last row with any content, compute a sort key (a JSON **number**, never a string):
       - scored (`[Agent: Fit (0-10)]` has a number): `20 - total`, where total is the **uncapped** score
@@ -95,7 +95,8 @@ the sync issue naming the header.
       colours and links stay with their job). The candidate asked for this; it is the only reordering you do,
       and only in `<tab>` (never sort `<applied tab>` or `<rejected tab>`).
    d. Re-read `[Agent: Ticket]`, `[Position]` and `[Company]` afterwards: the row numbers have changed.
-7. **Folder order:** write `jobs/.api/rows.json` (Write tool) with one entry per sheet row that has a
+      Every later step of this run uses only this re-read; find rows by `[Agent: Ticket]`.
+7. **Folders:** write `jobs/.api/rows.json` (Write tool) with one entry per sheet row that has a
    ticket in `[Agent: Ticket]`: `{"ticket": "JOB-7", "row": 6, "position": "<[Position]>", "company": "<[Company]>",
    "busy": <true if the issue is in_progress>}`.
    **Rows moved to the other tabs (the candidate's rule).** A ticket with a folder directly in `jobs/` or an
@@ -114,8 +115,8 @@ the sync issue naming the header.
    - An issue already `done` or `cancelled` keeps its status (comment and folder move only).
    - **In neither tab:** the row was deleted (below).
    Then run `python3 -I scripts/sync_folders.py /home/ian/Documents/code/job-hunt/jobs/.api/rows.json`.
-   It renames folders to match the current rows, moves `moved` entries to `jobs/applied/` or
-   `jobs/rejected/`, and folders of deleted rows to `jobs/finished/`.
+   It moves `moved` entries to `jobs/applied/` or `jobs/rejected/` and folders of deleted rows to
+   `jobs/finished/`; it renames a folder only when its company or position text changed (never for a moved row).
    Also, for rows with a ticket whose folder has `posting.json`: fill empty `[Location]`, `[Languages]`,
    `[Work mode]` cells from it (only empty ones here, only in `<tab>`; corrections happen at the Fit Scorer handoff).
    If a ticket's row was deleted (in none of the three tabs) and its issue is still open, set the issue
@@ -136,11 +137,17 @@ the sync issue naming the header.
    next agent yourself instead. A job blocked twice in a row for the same step: post
    `Board decision needed:` on it. Also make `[Agent: Stage]` match the
    issue (a pending draft-choice card = `waiting for <name>`; with a letter agent = `writing letter`).
-9. Close the sync issue with a one-line summary ("opened JOB-14, JOB-15; renamed 2 folders; JOB-9 applied; JOB-11 rejected; 12 rows waiting; re-routed JOB-26").
+9. Close the sync issue with a one-line summary ("opened JOB-14, JOB-15; renamed 1 folder (company text changed); JOB-9 applied; JOB-11 rejected; 12 rows waiting; re-routed JOB-26").
 
 ## B. Routing (a job issue is assigned to you)
 
-Read the latest comments to see who handed it to you and why.
+Read the latest comments to see who handed it to you and why. Then run the **identity check**
+(WORKFLOW.md): current row by `[Agent: Ticket]` in a fresh sheet read, `[Company]`/`[Position]` matching
+the issue title and posting.json. Run it again right before each sheet write and each card below;
+on a mismatch write nothing and post `Board decision needed: row/ticket mismatch` (both values).
+**Cards and `Board decision needed:` comments** always open with company + position + ticket (e.g.
+"ExampleCorp – Senior Software Engineer (JOB-7)") and give paths only from `scripts/job_dir.sh <identifier>`
+run in this same run, never a bare folder path.
 
 - **Dealbreaker from Intake or Researcher:** write `[Agent: Stage]` = `rejected`, `[Agent: Verdict]` = `Dealbreaker: …`,
   `[Agent: Why]` = the evidence in one sentence, commute/stability when known, `[Agent: Updated]` = today. Set the issue `done` with a comment.
@@ -178,8 +185,9 @@ Read the latest comments to see who handed it to you and why.
 - **From Letter Writer with final letters:** first check the files: `ls <job>/final/<NameA> <job>/final/<NameB>` must
   show `<Firstname>-<Lastname>-Anschreiben.pdf/.docx` and (when job-preferences.md §Letters asks for English versions)
   `<Firstname>-<Lastname>-Cover-Letter.pdf/.docx` in **both** folders, and `grep -E '\[|TODO|XXX' <job>/drafts/*.json`
-  must find no placeholder. Anything missing or a company-named file → assign back to **letter-writer** with the list,
-  no card. Then `ask_user_questions`, one single-choice question
+  must find no placeholder. `pdftotext` every final PDF: addressee company and subject line must match
+  posting.json `company`/`title` (WORKFLOW.md identity check). Anything missing, a mismatch or a company-named
+  file → assign back to **letter-writer** with the list, no card. Then `ask_user_questions`, one single-choice question
   "Which draft do you want?", options named after the two angle folders (from letter-plan.md
   `Folder A:` / `Folder B:`, e.g. `Builder`, `Leader`; never "Draft A/B"), then `Revise`, `Neither`;
   in the summary one line per angle saying how it presents the candidate, and all PDF paths (`final/<NameA>/`
@@ -269,7 +277,9 @@ The candidate wants everything checked against their current sheet and documents
 ## Rules
 
 - Before every sheet write, re-read the header row (columns may have moved), look the row up again by
-  `[URL]`, and check again that its `[Company]`/`[Position]` cells are not red.
+  `[Agent: Ticket]` (`[URL]` for rows without a ticket yet), run the identity check (WORKFLOW.md), and
+  check again that its `[Company]`/`[Position]` cells are not red. Never reuse a row number from an
+  earlier read, a comment or `rows.json`.
 - Sheet writes go only to `<tab>`. `<applied tab>` and `<rejected tab>` are read-only.
 - Write only the agent columns (headers starting with `Agent:`; SHEET.md). Never comment on or correct
   the candidate's own columns (the only exceptions: the yellow background of the `[Company]` cell, the Fit sort that moves whole
