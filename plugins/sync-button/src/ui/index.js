@@ -1,8 +1,6 @@
-// Dashboard widget: one big button that runs the "Full refresh" routine, plus its latest run.
-// Runs inside the Paperclip page (same origin), so it calls the board API directly.
+// Dashboard widgets: one big button per routine ("Full refresh", "Find jobs"), plus its latest run.
+// They run inside the Paperclip page (same origin), so they call the board API directly.
 import { createElement as h, useCallback, useEffect, useState } from "react";
-
-const ROUTINE_TITLE = "Full refresh";
 
 async function api(path, init) {
   const res = await fetch(`/api${path}`, {
@@ -18,7 +16,7 @@ function when(ts) {
   return ts ? new Date(ts).toLocaleString() : "";
 }
 
-export function SyncNowWidget({ context }) {
+function RoutineButton({ context, routineTitle: ROUTINE_TITLE, heading, text, label, started }) {
   const companyId = context.companyId;
   const [routine, setRoutine] = useState(null);
   const [lastRun, setLastRun] = useState(null);
@@ -54,7 +52,7 @@ export function SyncNowWidget({ context }) {
     setMessage("");
     try {
       await api(`/routines/${routine.id}/run`, { method: "POST", body: JSON.stringify({ source: "manual" }) });
-      setMessage("Started. The Coordinator is on it.");
+      setMessage(started);
       await load();
     } catch (e) {
       setMessage(`Could not start: ${e.message ?? e}`);
@@ -70,12 +68,12 @@ export function SyncNowWidget({ context }) {
 
   return h(
     "section",
-    { "aria-label": "Sync now", style: { display: "grid", gap: 12 } },
-    h("strong", { style: { fontSize: 16 } }, "Job hunt: full refresh"),
+    { "aria-label": label, style: { display: "grid", gap: 12 } },
+    h("strong", { style: { fontSize: 16 } }, heading),
     h(
       "div",
       { style: { fontSize: 13, opacity: 0.8 } },
-      "Checks the sheet, your CVs and documents, re-sorts by Fit and re-checks letters if your documents changed.",
+      text,
     ),
     h(
       "button",
@@ -95,7 +93,7 @@ export function SyncNowWidget({ context }) {
           width: "100%",
         },
       },
-      busy ? "Starting…" : "Sync now",
+      busy ? "Starting…" : label,
     ),
     lastRun
       ? h(
@@ -110,4 +108,26 @@ export function SyncNowWidget({ context }) {
       : null,
     message ? h("div", { style: { fontSize: 13 } }, message) : null,
   );
+}
+
+export function SyncNowWidget({ context }) {
+  return h(RoutineButton, {
+    context,
+    routineTitle: "Full refresh",
+    heading: "Job hunt: full refresh",
+    text: "Checks the sheet, your CVs and documents, re-sorts by Fit and re-checks letters if your documents changed.",
+    label: "Sync now",
+    started: "Started. The Coordinator is on it.",
+  });
+}
+
+export function FindJobsWidget({ context }) {
+  return h(RoutineButton, {
+    context,
+    routineTitle: "Find jobs",
+    heading: "Job hunt: find new jobs",
+    text: "Finds one chunk of new jobs for the scout tab and reviews it. Pressed again, the next chunk waits until this one is reviewed.",
+    label: "Find jobs",
+    started: "Started. The Job Scout is on it; a chunk still running finishes first.",
+  });
 }

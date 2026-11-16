@@ -1,0 +1,63 @@
+{
+ "chunk_size": 10,
+ "max_age_days": 30,
+ "search_print_per_tier": 14,
+ "tier_order": [
+  "home",
+  "nearby",
+  "remote"
+ ],
+ "title_keywords": [
+  "<short keyword, whole word>",
+  "<longer keyword, substring>"
+ ],
+ "title_exclude": [
+  "werkstudent",
+  "praktik",
+  "intern",
+  "ausbildung",
+  "trainee",
+  "junior"
+ ],
+ "local_places": {
+  "home": [
+   "<your town>",
+   "<neighbouring town>"
+  ],
+  "nearby": [
+   "<big city in commute range>"
+  ]
+ },
+ "ba_searches": [
+  {
+   "tier": "home",
+   "what": "<search term>",
+   "where": "<your town>",
+   "radius_km": 25,
+   "size": 100
+  },
+  {
+   "tier": "nearby",
+   "what": "<search term>",
+   "where": "<big city>",
+   "radius_km": 15,
+   "size": 100
+  },
+  {
+   "tier": "remote",
+   "what": "<search term>",
+   "homeoffice_only": true,
+   "size": 100
+  }
+ ],
+ "arbeitnow": {
+  "enabled": true,
+  "pages": 3
+ },
+ "web_searches_per_run": 3,
+ "web_queries": [
+  "site:stepstone.de <role> <your town>",
+  "site:de.indeed.com <role> remote Deutschland"
+ ],
+ "target_companies_per_run": 3
+}

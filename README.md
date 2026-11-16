@@ -1,8 +1,10 @@
 # Jobject: job application agents
 
-A team of AI agents on [Paperclip](https://github.com/paperclipai/paperclip) that rates job postings
-from the candidate's Google Sheet and drafts cover letters for the ones they want to apply to. Agents
-never submit anything; the candidate reviews and sends applications themselves.
+Two teams of AI agents on [Paperclip](https://github.com/paperclipai/paperclip). The **scouting team**
+finds new job postings that fit the candidate and lists them, reviewed, in its own tab of the
+candidate's Google Sheet. The **rating and letter team** rates the postings in the candidate's job tab
+and drafts cover letters for the ones they want to apply to. Agents never submit anything; the
+candidate picks the jobs, reviews the letters and sends applications themselves.
 
 ## Rules in git, personal data only on your machine
 
@@ -11,7 +13,8 @@ config. **Everything about the person looking for a job lives only in two gitign
 
 - `documents/`: CVs, references (Arbeitszeugnisse), certificates, the profile (`about-me.md`), the
   tunable job-search parameters (`job-preferences.md`: commute limits, location score, target work,
-  dealbreakers, bonuses, salary pitch, letter rules, sheet id and column map), the letter sender block
+  dealbreakers, bonuses, salary pitch, letter rules, sheet id and column map), the job searches
+  (`search.json`), the letter sender block
   (`sender.json`) and the home location for the commute check (`commute-home.json`).
 - `jobs/`: one folder per job with the posting, ratings, research and letters.
 
@@ -103,17 +106,42 @@ language tag, so they can be sent as they are.
 
 Rules live in `agents/_shared/WORKFLOW.md` (process) and `agents/_shared/SHEET.md` (sheet contract).
 
+## Finding jobs: the scouting team
+
+```mermaid
+flowchart TD
+    trig["Daily schedule, or<br/>the Find jobs button"] --> q{"Older chunk still<br/>scouted or reviewed?"}
+    q -- yes --> wait["queued until it is finished"] --> scout
+    q -- no --> scout["Job Scout<br/>finds up to one chunk of new jobs,<br/>writes one row each in the scout tab"]
+    scout --> rev["Job Reviewer<br/>checks each job: open and recent,<br/>commute, target work, level;<br/>PASS / UNSURE / FAIL and match level"]
+    rev --> me{"Candidate:<br/>want this job?"}
+    me -- yes --> move["candidate moves the row to the job tab;<br/>the rating and letter team takes over"]
+    classDef me fill:#fde68a,stroke:#b45309,color:#000
+    class me me
+```
+
+| Agent | Job |
+|---|---|
+| Job Scout | one chunk per run (size, posting age, searches: `documents/search.json`): job-board APIs, web search, careers pages of the candidate's target companies; nearest jobs first, never LinkedIn, nothing the candidate already has in a tab |
+| Job Reviewer | independent check of the chunk from the saved postings: still open and recent, commute limit, target work, level, formal requirements; writes verdict, match level, commute and notes |
+
+Built to use few tokens: `scripts/scout.py` does the searching, age and title filtering, duplicate
+check, page saving and queueing without a model; both agents run on Sonnet, read only their own short
+rules (`agents/_shared/SCOUTING.md`), work on one issue per chunk and do no stability or salary
+research (the rating team does that for the jobs the candidate picks). The candidate's choices are in
+`documents/job-preferences.md` §Search and `documents/search.json`.
+
 ## Layout
 
 ```
 agents/             one AGENTS.md per agent + _shared/ (workflow, sheet contract, agent ids)
 config/             Claude account (one file) + per-agent permission allowlists (generated)
-scripts/            instance, provisioning, commute check, page fetch, letter rendering, folder sync
+scripts/            instance, provisioning, commute check, page fetch, letter rendering, folder sync, job scouting
 templates/          Paperclip instance config
 plugins/            Dashboard "Sync now" button
 documents.example/  blank templates of every personal file, committed: copy to documents/
 documents/          PERSONAL: CVs, references, profile, job preferences, sender block   (gitignored)
-jobs/               one folder per job: <company>_<position>/ (+ .ticket)             (gitignored)
+jobs/               one folder per job: <company>_<position>/ (+ .ticket); scout/ = scouted chunks   (gitignored)
 paperclip/          copy of the Paperclip server                                       (gitignored)
 ```
 
@@ -125,7 +153,8 @@ paperclip/          copy of the Paperclip server                                
 scripts/instance.sh start              # own instance on :3300 (never touches other Paperclip instances)
 scripts/provision.sh                   # agents, permissions, hourly sheet-sync routine (idempotent)
 scripts/sync-now.sh                    # full refresh now (same as the "Sync now" Dashboard button)
-plugins/sync-button/build.sh           # build + install the Dashboard "Sync now" button plugin
+scripts/find-jobs.sh                   # scout one chunk of new jobs now (same as the "Find jobs" Dashboard button)
+plugins/sync-button/build.sh           # build + install the Dashboard buttons plugin ("Sync now", "Find jobs")
 python3 -I scripts/gen-settings.py     # regenerate permission allowlists after changing them
 scripts/switch-claude-account.sh ~/.claude-other   # move all agents to another Claude account
 ```
@@ -142,4 +171,5 @@ and eligibility checks, tighter permissions); a main-proof reference document; E
 German letters; folders by sheet row; yellow "waiting for the candidate" cells; Fit-sorted sheet;
 salary range + pitch; header-based columns; location preference score. 2026-11-16: commute limit by
 onsite frequency; all personal values moved out of the committed files into the gitignored
-`documents/` (with blank templates in `documents.example/`).
+`documents/` (with blank templates in `documents.example/`); scouting team (Job Scout, Job Reviewer)
+with its own sheet tab, a daily run and a "Find jobs" button.

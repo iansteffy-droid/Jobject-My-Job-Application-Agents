@@ -33,7 +33,9 @@ fit-scorer|Fit Scorer|general|opus|900|50
 letter-strategist|Letter Strategist|general|opus|900|50
 letter-writer|Letter Writer|general|opus|1200|80
 fact-checker|Fact-checker|qa|opus|900|60
-proofreader|Proofreader|qa|sonnet|900|50"
+proofreader|Proofreader|qa|sonnet|900|50
+job-scout|Job Scout|researcher|sonnet|1800|90
+job-reviewer|Job Reviewer|qa|sonnet|1200|60"
 
 agents="$(req GET "/api/companies/$CID/agents")"
 echo '{}' > "$TMP/roster.json"
@@ -94,5 +96,20 @@ if [ -z "$fid" ]; then
   echo "created routine $FTITLE ($fid)"
 else
   echo "routine $FTITLE exists ($fid)"
+fi
+# Find-jobs routine (scouting team, agents/_shared/SCOUTING.md): one chunk a day, plus the "Find jobs" Dashboard
+# button and scripts/find-jobs.sh. always_enqueue: every start opens its own chunk issue; scripts/scout.py
+# (start / finish) makes the chunks run strictly one after another.
+JTITLE="Find jobs"
+SCOUT="$(jq -r '."job-scout"' "$JH/agents/_shared/roster.json")"
+jid="$(req GET "/api/companies/$CID/routines" | jq -r --arg t "$JTITLE" '.[]|select(.title==$t)|.id' | head -n1)"
+if [ -z "$jid" ]; then
+  jid="$(req POST "/api/companies/$CID/routines" "$(jq -nc --arg a "$SCOUT" --arg t "$JTITLE" \
+    '{title:$t, assigneeAgentId:$a, priority:"low", concurrencyPolicy:"always_enqueue", catchUpPolicy:"skip_missed",
+      description:"Scout one chunk of new jobs into the scout tab (Job Scout instructions), then hand it to the Job Reviewer."}')" | jq -r .id)"
+  req POST "/api/routines/$jid/triggers" '{"kind":"schedule","label":"daily","cronExpression":"0 8 * * *","timezone":"Europe/Berlin"}' >/dev/null
+  echo "created routine $JTITLE ($jid)"
+else
+  echo "routine $JTITLE exists ($jid)"
 fi
 echo "company $CID ready: $API"

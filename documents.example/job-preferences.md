@@ -119,6 +119,48 @@ names the pitch from the job's `salary.md`; without salary.md the sentence is le
 - <How much the agents should do: plan, write and proofread the letters for you; see about-me.md §7.>
 - Own writing samples to study the voice: <path under documents/, or "none">
 
+## Search
+
+Used by the scouting team (Job Scout, Job Reviewer; `agents/_shared/SCOUTING.md`). The machine-readable
+part is `search.json`: chunk size, maximum posting age, title keywords and exclusions, the job-board
+searches per tier, the web queries and how many target companies to check per run.
+
+- **Chunk:** <e.g. 10 jobs per run, once a day, plus the "Find jobs" button; runs queue one after another>
+- **Posting age:** <e.g. at most 30 days since first publication; no date on the posting: include it, marked `date unknown`>
+- **Where to look, in this order of preference** (<your rule, date>): <e.g. your home town, then anywhere inside the commute limits of §Commute, then remote in your country, then remote abroad. Point at §Commute and §Location score; do not repeat their numbers>
+- **Sources:** <e.g. Arbeitsagentur and Arbeitnow (through `scripts/scout.py search`), StepStone and Indeed (web search), general web search, careers pages of the companies in your target-company tab>
+- **Never:** LinkedIn (no search, no fetch, no LinkedIn URL in the sheet).
+- **After the review:** the candidate reads the scout tab and moves the rows they want to the job tab
+  themselves. The scouting team never writes to the job tab.
+
+### Scout tab
+
+- **Tab:** `<scout tab name>` (sheetId `<sheetId>`), same spreadsheet as §Sheet. Header row **<n>**, data from row <n+1>.
+- **Read-only tabs the Scout checks for jobs the candidate already has:** the job tab, the applied tab and
+  the rejected tab (§Sheet), columns A to G.
+- **Target-company tab (read-only):** `<tab with your target companies, or: none>` (header row <n>: company, industry, site URL, location).
+
+| Role | Exact header | Today | Who writes |
+|---|---|---|---|
+| `[Position]` | `Position` | B | Job Scout; Reviewer corrects |
+| `[Company]` | `Company` | D | Job Scout; Reviewer corrects |
+| `[URL]` | `URL` | E | Job Scout; **the key used to find a row** |
+| `[Work mode]` | `Remote/ inhouse ` | F | Job Scout; Reviewer corrects (header has a trailing space) |
+| `[Languages]` | `Lang req` | H | Job Scout; Reviewer corrects |
+| `[Location]` | `Location` | I | Job Scout; Reviewer corrects |
+| `[Cons]` | `Cons` | J | Job Scout |
+| `[Positives]` | `Positives / Notes ` | K | Job Scout (header has a trailing space) |
+| review verdict | `Scout: Review` | Y | Job Reviewer |
+| match level | `Scout: Match` | Z | Job Reviewer |
+| review notes | `Scout: Review notes` | AA | Job Reviewer |
+| commute | `Scout: Commute` | AB | Job Reviewer |
+| posting date | `Scout: Posted` | AC | Job Scout; Reviewer corrects |
+| date found | `Scout: Found` | AD | Job Scout |
+| where found | `Scout: Source` | AE | Job Scout |
+| chunk | `Scout: Chunk` | AF | Job Scout (the chunk's issue identifier) |
+
+**Never-write columns in the scout tab:** <your own marker columns, e.g. `Date Applied`, your own score> and every `Agent:` column. The `Agent:` columns stay empty in the scout tab; the Coordinator fills them after you moved the row to the job tab.
+
 ## Sheet
 
 - **Spreadsheet:** <sheet name>, id `<spreadsheet id from the sheet URL: docs.google.com/spreadsheets/d/<id>/edit>`
