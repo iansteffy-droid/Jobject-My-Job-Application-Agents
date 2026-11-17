@@ -6,7 +6,9 @@ Judge from the saved posting, not from the Scout's cells.
 
 Read first, once each: `/home/ian/Documents/code/job-hunt/agents/_shared/SCOUTING.md`,
 `/home/ian/Documents/code/job-hunt/documents/job-preferences.md` (whole file) and the candidate's CV text
-named first in `/home/ian/Documents/code/job-hunt/documents/text/README.txt` (one CV is enough).
+named first in `/home/ian/Documents/code/job-hunt/documents/text/README.txt` (one CV is enough), and
+`/home/ian/Documents/code/job-hunt/jobs/scout/learned.md` if it exists (patterns learned from the
+candidate's earlier decisions, SCOUTING.md "Learning from the candidate's decisions").
 
 ## Steps
 
@@ -14,6 +16,8 @@ named first in `/home/ian/Documents/code/job-hunt/documents/text/README.txt` (on
    `chunk.json` there; you review the entries with status `listed`.
 2. **Read the scout tab** once: header row plus all rows. Your rows are those whose `Scout: Chunk` is this
    issue's identifier. A `listed` job without a row, or a row without a `listed` job, goes into your summary.
+   Then read the background colours of your rows (one `get_spreadsheet` call, as in SCOUTING.md). A row
+   with a red cell is the candidate's "no": review the job for review.json, but write nothing in that row.
 3. **For each job, read `postings/<nn>.md` once** and check, in this order. Stop at the first FAIL:
    1. **Open and recent:** the posting is a real, open job posting (not a list page, not expired) and
       `Scout: Posted` is at most `max_age_days` (documents/search.json) old or `date unknown`.
@@ -31,8 +35,17 @@ named first in `/home/ian/Documents/code/job-hunt/documents/text/README.txt` (on
    §Role level, §Bonuses: `High` (target work is the core duty and the CV covers the must-haves), `Medium`
    (target work is part of the job, or one or two must-haves are missing), `Low` (title-only target work,
    or most must-haves missing). No number: the Fit Scorer rates the job properly once the candidate moves it.
-5. **review.md** (Write tool, chunk folder): per job three lines: verdict + match, the deciding posting
-   quote (copied exactly), the commute result.
+   **learned.md:** a job that matches a `Deny` pattern goes one level down (High → Medium → Low); one that
+   matches an `Accept` pattern may go one level up when the must-haves allow it. Name the pattern in the
+   notes (`learned: <pattern in a few words>`). Learned patterns never change PASS / FAIL / UNSURE: the
+   checks above and job-preferences.md decide those (hard rules win).
+5. **review.json** (Write tool, chunk folder): one entry per reviewed job:
+   ```json
+   [{"n": 1, "verdict": "PASS | FAIL: <reason> | UNSURE: <what to decide>", "match": "High | Medium | Low | ",
+     "quote": "<the deciding posting quote, copied exactly>", "commute": "", "notes": "<same as Scout: Review notes>",
+     "row": 12}]
+   ```
+   `row` is the job's sheet row, `null` when it has none (step 2).
 6. **Write the sheet:** write the review columns of all your rows in one `update_values` call (the rows
    of one chunk are consecutive; `null` for cells you do not change). Your columns (§Scout tab):
    - `Scout: Review`: `PASS`, `FAIL: <reason in a few words>` or `UNSURE: <what the candidate must decide>`
@@ -43,5 +56,6 @@ named first in `/home/ian/Documents/code/job-hunt/documents/text/README.txt` (on
      any formal requirement.
    - **Corrections:** if a cell the Scout wrote (`[Work mode]`, `[Languages]`, `[Location]`, `[Position]`,
      `[Company]`, `Scout: Posted`) contradicts the posting, write the correct value and say so in the notes.
-   FAIL rows stay in the tab with their reason; never clear or delete a row.
+   FAIL rows stay in the tab with their reason; never clear or delete a row. Red rows (step 2) get `null`
+   in every cell.
 7. **Close:** `scout.py finish "Reviewed <n>: <p> PASS (<h> High), <u> UNSURE, <f> FAIL. Best: <Company – Position>; <Company – Position>."`

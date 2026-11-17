@@ -28,6 +28,7 @@ allowed form and go on; never stop because of a denial.
 ```bash
 python3 -I /home/ian/Documents/code/job-hunt/scripts/scout.py start        # Scout: first step → GO <chunk folder> | WAIT
 python3 -I /home/ian/Documents/code/job-hunt/scripts/scout.py dir          # Reviewer: first step → <chunk folder>
+python3 -I /home/ian/Documents/code/job-hunt/scripts/scout.py feedback     # Scout: the candidate's decisions since the last run
 python3 -I /home/ian/Documents/code/job-hunt/scripts/scout.py search
 python3 -I /home/ian/Documents/code/job-hunt/scripts/scout.py check "<company>" "<title>" "<url>"
 python3 -I /home/ian/Documents/code/job-hunt/scripts/scout.py fetch <n> "<url>"
@@ -42,9 +43,16 @@ python3 -I /home/ian/Documents/code/job-hunt/scripts/scout.py finish "<one-line 
 |---|---|---|
 | `postings/<nn>.md` | `scout.py fetch` | the posting text, verbatim, with source URL and date |
 | `chunk.json` | Job Scout | one entry per job looked at (format in the Scout's instructions) |
-| `review.md` | Job Reviewer | one short block per job: verdict and evidence |
+| `review.json` | Job Reviewer | one entry per reviewed job: verdict, match, quote, commute, notes, row (older chunks: `review.md`) |
 
-`jobs/scout/seen.json` (kept by `scout.py`) remembers every job ever looked at, so it is never found twice.
+Kept for the whole team in `jobs/scout/`:
+
+| File | Written by | Content |
+|---|---|---|
+| `seen.json` | `scout.py record` | every job ever looked at, so it is never found twice |
+| `sheet-now.json` | Job Scout, each run | identities and red marks read from the tabs, input of `scout.py feedback` (consumed by it) |
+| `feedback.jsonl` | `scout.py feedback` | one line per decision of the candidate on a scouted job (append-only) |
+| `learned.md` | Job Scout | the patterns learned from `feedback.jsonl`; read by Scout and Reviewer every run |
 
 ## Ground rules
 
@@ -74,3 +82,66 @@ through the `mcp__claude_ai_Google_Sheets__*` tools. `update_values` takes exact
   the rating team.
 - Never insert, delete, sort, colour or move rows or columns. New rows go directly below the last row
   that has a `[URL]`.
+- **Red rows belong to the candidate.** A row with any red cell (rule below) is the candidate's "no":
+  never write, clear, recolour or delete anything in it, also not a correction.
+
+## Learning from the candidate's decisions
+
+The candidate's handling of the scouted rows is the team's feedback. `scout.py feedback` classifies every
+job the team listed earlier (`listed` in a chunk.json) exactly once:
+
+| Decision | What the candidate did |
+|---|---|
+| **denied** | coloured any cell of the row red in the scout tab, or the job is in the rejected tab |
+| **accepted** | moved or copied the row to the job tab, or the job is in the applied tab |
+| **deleted** | the row is gone from the scout tab and the job is in no other tab |
+| pending | the row is still in the scout tab, uncoloured: nothing is logged yet |
+
+Order when several apply: red in the scout tab, applied tab, rejected tab, job tab, scout tab. A job is
+recognised by its URL without query string (tracking parameters never matter; the query only counts
+when the path has no number in it), else by company + title. A logged decision is never changed; a
+denied or deleted job is reported `SEEN` by `scout.py check` and dropped by `scout.py search` forever.
+A job the Reviewer found no row for (`"row": null` in review.json) never reached the sheet and is not
+classified.
+
+**Red** (the Coordinator's rule, any shade): background colour with a missing channel = 0, `mx = max(r,g,b)`,
+`mn = min(r,g,b)`; red when `r == mx`, `mx - mn >= 0.08` and `max(g,b) - min(g,b) <= 0.5 * (mx - mn)`.
+Red: `{r:0.957,g:0.8,b:0.8}`, `{r:0.6}`, `{r:1}`. Not red: white, grey, orange `{r:1,g:0.6}`, yellow.
+Read the colours with `get_spreadsheet`: range `'<scout tab>'!A<first data row>:<last column of the §Scout tab column map>`,
+`includeGridData: true`, fields `sheets.data.rowData.values.effectiveFormat.backgroundColor`; the n-th
+entry of `rowData` is sheet row `<first data row> + n - 1`.
+
+**`jobs/scout/sheet-now.json`** (Job Scout, Write tool, fresh every run; `scout.py feedback` refuses a file
+older than three hours and renames it once read). `scout`, `job`, `applied`, `rejected` list every row
+that has a URL, company or position, in the tab's own columns found by header (a tab named "none" is
+an empty list). `scout_colors` lists only the scout-tab rows with at least one cell whose background is
+neither white nor empty, with those colours copied as returned:
+
+```json
+{"scout":    [{"row": 4, "company": "", "title": "", "url": ""}],
+ "scout_colors": [{"row": 7, "colors": [{"red": 0.957, "green": 0.8, "blue": 0.8}]}],
+ "job":      [{"company": "", "title": "", "url": ""}],
+ "applied":  [{"company": "", "title": "", "url": ""}],
+ "rejected": [{"company": "", "title": "", "url": ""}]}
+```
+
+`scout.py feedback` appends each new decision to `jobs/scout/feedback.jsonl` (date, decision, where,
+company, title, location, work mode, salary, review verdict and match, cons, the Reviewer's notes,
+source, posted, URL; taken from chunk.json and review.json) and prints the red rows, the new decisions,
+counts and every decision so far. `LEARN: no new decisions` → keep `learned.md`.
+
+**`jobs/scout/learned.md`** (Job Scout rewrites it when `feedback` printed `LEARN: rewrite`). At most 15
+lines, one pattern each, concrete, with counts and examples, only patterns backed by **at least two**
+decisions, contradicting cases named:
+
+```markdown
+# Learned from <n> decisions (updated <date>)
+- Deny: temp-agency / staffing placements: denied or deleted 4/4 (Agency A, Agency B, ...).
+- Accept: fully remote roles where agents are the core duty: accepted 3/4 (A, B, C; D deleted).
+- Weak deny: pre-sales / customer-facing roles: deleted 2/3 (X, Y; but Z accepted).
+```
+
+`Deny` / `Accept` = at least 3 decisions and at most one contradiction; fewer or mixed = `Weak`.
+**Hard rules win:** a learned pattern never overrides job-preferences.md (commute limits,
+dealbreakers, level, target work). It only reorders or skips jobs those rules let through, and it never
+makes a job pass that they fail.

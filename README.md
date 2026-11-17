@@ -131,6 +131,12 @@ rules (`agents/_shared/SCOUTING.md`), work on one issue per chunk and do no stab
 research (the rating team does that for the jobs the candidate picks). The candidate's choices are in
 `documents/job-preferences.md` §Search and `documents/search.json`.
 
+The team learns from what the candidate does with its rows: before each search `scout.py feedback`
+logs every scouted job as accepted (moved to the job or applied tab), denied (a red cell, or the
+rejected tab) or deleted, and the Job Scout keeps the patterns in `jobs/scout/learned.md`, which both
+agents use to skip or rank jobs; denied and deleted jobs never come back, and the hard rules in
+`job-preferences.md` always win.
+
 ## Layout
 
 ```
