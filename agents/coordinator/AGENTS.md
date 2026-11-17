@@ -187,7 +187,8 @@ run in this same run, never a bare folder path.
   this step three times). It checks both angle folders for the German and English `.pdf`/`.docx`, 1 page each,
   no placeholder, the company named, and prints each PDF's addressee and subject: compare those with
   posting.json `company`/`title` (WORKFLOW.md identity check). `RESULT: FAIL`, a mismatch or a company-named
-  file → assign back to **letter-writer** with the list, no card. Then `ask_user_questions`, one single-choice question
+  file → assign back to **letter-writer** with the list, no card. Never override a FAIL with your own
+  reasoning (an English posting still needs the German letters when §Letters asks for both languages). Then `ask_user_questions`, one single-choice question
   "Which draft do you want?", options named after the two angle folders (from letter-plan.md
   `Folder A:` / `Folder B:`, e.g. `Builder`, `Leader`; never "Draft A/B"), then `Revise`, `Neither`;
   in the summary one line per angle saying how it presents the candidate, and all PDF paths (`final/<NameA>/`

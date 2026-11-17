@@ -85,11 +85,11 @@ Keep a round counter in your comment (`Round 1`, `Round 2`).
   re-render first.
   The hand-off comment names company + position + ticket before the paths (WORKFLOW.md).
 
-## English versions (when job-preferences.md §Letters asks for them)
+## Both languages (when job-preferences.md §Letters asks for them)
 
-If job-preferences.md §Letters asks for an English version of every German letter (e.g. because the
-candidate's German is limited), every German letter also gets an English version they can read (and
-could send). Then the English version is **mandatory for every angle** (both A and B): a job is not
+If job-preferences.md §Letters asks for both languages for every letter (e.g. because the candidate's
+German is limited), every German letter also gets an English version they can read (and could send), and
+every English letter a German version (below). Then the English version is **mandatory for every angle** (both A and B): a job is not
 finished until each angle folder holds the German and the English letter (four files per folder with
 `.pdf` + `.docx`). After both reviews have passed:
 1. Translate each final draft faithfully into English: `drafts/A.en.json`, `drafts/B.en.json` (same
@@ -102,6 +102,12 @@ finished until each angle folder holds the German and the English letter (four f
    with make_letter.mjs (must be 1 page; shorten wording only, never content).
 3. The translation needs no new review round, because it adds no claims. Re-read it once against
    the German to make sure nothing was added or lost.
-If the posting is in English, the letter is already English and nothing extra is needed.
+**English posting:** when §Letters says "both languages for every letter", the English letter is the
+reviewed original and you add the **German** version the same way: translate each final draft faithfully into
+German (`drafts/A.de.json`, `drafts/B.de.json`, `"language": "de"`), subject "Bewerbung als <job title>" (keep any
+reference number), "Sehr geehrte Damen und Herren," (or "Sehr geehrte Frau / Sehr geehrter Herr <Nachname>,"),
+Sie-form, closing "Mit freundlichen Grüßen", attachments "Lebenslauf", "Zeugnisse", "Zertifikate"; render to
+`final/<Name>/<Firstname>-<Lastname>-Anschreiben`. A job is never finished with English only: check_final.sh
+fails without the German files.
 - The candidate asked for a revision → revise, render, then fact-checker and proofreader again (round counter
   restarts).

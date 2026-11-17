@@ -114,8 +114,8 @@ names the pitch from the job's `salary.md`; without salary.md the sentence is le
 ## Letters
 
 - Letter language = the posting's language (German posting → German letter).
-- **English version of every German letter:** <always / never> <!-- e.g. "always, because my German
-  is limited" -->
+- **Both languages for every letter:** <always / never> <!-- "always" = every angle gets a German and an
+  English letter, whatever the posting's language (e.g. because your German is limited) -->
 - <How much the agents should do: plan, write and proofread the letters for you; see about-me.md §7.>
 - Own writing samples to study the voice: <path under documents/, or "none">
 
