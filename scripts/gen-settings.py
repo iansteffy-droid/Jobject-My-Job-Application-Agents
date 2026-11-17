@@ -53,9 +53,9 @@ ROLES = {
     "fact-checker": BASE,
     "proofreader": BASE,
     # Scouting team (agents/_shared/SCOUTING.md): both write only the scout tab; no colouring, so no update_spreadsheet.
-    "job-scout": BASE + SHEETS_UPDATE + bash("python3 -I scripts/scout.py", f"python3 -I {J}/scripts/scout.py",
+    "job-scout": BASE + SHEETS_UPDATE + bash("python3 -I scripts/scout.py", f"python3 -I {J}/scripts/scout.py", "python3 scripts/scout.py", f"python3 {J}/scripts/scout.py",
                                              *script("scripts/fetch_page.sh")),
-    "job-reviewer": BASE + SHEETS_UPDATE + bash("python3 -I scripts/scout.py", f"python3 -I {J}/scripts/scout.py",
+    "job-reviewer": BASE + SHEETS_UPDATE + bash("python3 -I scripts/scout.py", f"python3 -I {J}/scripts/scout.py", "python3 scripts/scout.py", f"python3 {J}/scripts/scout.py",
                                                 "python3 -I scripts/commute.py", f"python3 -I {J}/scripts/commute.py"),
 }
 
