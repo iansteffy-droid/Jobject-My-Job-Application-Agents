@@ -152,6 +152,7 @@ paperclip/          copy of the Paperclip server                                
 ```bash
 scripts/instance.sh start              # own instance on :3300 (never touches other Paperclip instances)
 scripts/provision.sh                   # agents, permissions, hourly sheet-sync routine (idempotent)
+scripts/sync-spreadsheet.sh            # sheet sync now: new rows, fill columns, stages, fit ranking (the hourly routine)
 scripts/sync-now.sh                    # full refresh now (same as the "Sync now" Dashboard button)
 scripts/find-jobs.sh                   # scout one chunk of new jobs now (same as the "Find jobs" Dashboard button)
 plugins/sync-button/build.sh           # build + install the Dashboard buttons plugin ("Sync now", "Find jobs")
