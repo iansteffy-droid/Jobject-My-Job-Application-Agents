@@ -6,7 +6,9 @@ Usage: python3 -I scripts/scout.py <command>
 
   start                    Scout, first step: checks the issue out, queues it behind an older chunk
                            that is still being scouted or reviewed, creates the chunk folder.
-                           Prints `GO <chunk folder>` or `WAIT ...` (then stop the run).
+                           Prints `GO <chunk folder>` or `WAIT ...` (then stop the run). For a chunk
+                           started by the schedule it adds the check that skips the run while the
+                           scout tab still holds enough jobs (documents/search.json, scheduled_run).
   search                   Job boards (Arbeitsagentur, Arbeitnow, StepStone) with the searches from
                            documents/search.json: only postings young enough, title filter applied,
                            already-seen jobs removed. One line per candidate: nearby jobs first, and
@@ -30,6 +32,7 @@ import datetime as dt
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -456,7 +459,7 @@ def cmd_feedback():
 
 # ---------- Paperclip ----------
 
-def api(method, path, body=None):
+def api(method, path, body=None, soft=False):
     base, key = os.environ.get("PAPERCLIP_API_URL"), os.environ.get("PAPERCLIP_API_KEY")
     if not base or not key:
         die("PAPERCLIP_API_URL / PAPERCLIP_API_KEY missing: this command only works inside an agent run")
@@ -468,6 +471,8 @@ def api(method, path, body=None):
     try:
         return http_json(base.rstrip("/") + path, headers, method, body)
     except urllib.error.HTTPError as e:
+        if soft:
+            return None
         die(f"{method} {path}: HTTP {e.code}: {e.read()[:400].decode(errors='replace')}")
 
 
@@ -495,6 +500,15 @@ def chunk_dir(issue, create=False):
     return d
 
 
+def run_source(issue):
+    """How this chunk was started: "schedule" (the daily trigger) or "manual" (button, find-jobs.sh)."""
+    routine = api("GET", f"/api/routines/{issue.get('originId')}", soft=True) or {}
+    for run in routine.get("recentRuns") or []:
+        if run.get("id") == issue.get("originRunId") or run.get("linkedIssueId") == issue["id"]:
+            return run.get("source") or "manual"
+    return "manual"
+
+
 def cmd_start():
     me = my_issue()
     fresh = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=STALE_HOURS)).isoformat()
@@ -509,6 +523,13 @@ def cmd_start():
     api("POST", f"/api/issues/{me['id']}/checkout",
         {"agentId": os.environ["PAPERCLIP_AGENT_ID"], "expectedStatuses": ["todo", "backlog", "in_progress", "in_review", "blocked"]})
     print(f"GO {chunk_dir(me, create=True)}  (issue {me['identifier']}, today {TODAY.isoformat()})")
+    gate = config().get("scheduled_run") or {}
+    if run_source(me) == "schedule" and gate.get("skip_when_rows_at_least"):
+        n = gate["skip_when_rows_at_least"]
+        print(f"SCHEDULED RUN, check first, before reading any other file: read {gate['range']} of spreadsheet "
+              f"{gate['spreadsheet_id']} (one get_values call) and count the rows below the header that have a value in "
+              f"the column headed `{gate['url_header']}`. {n} or more → run `scout.py finish \"Skipped the scheduled "
+              f"search: the scout tab still holds <count> jobs (limit {n}).\"` and stop. Fewer than {n} → continue normally.")
 
 
 def cmd_dir():
@@ -557,6 +578,9 @@ def cmd_finish(comment):
     me = my_issue()
     api("POST", f"/api/issues/{me['id']}/comments", {"body": comment})
     api("PATCH", f"/api/issues/{me['id']}", {"status": "done"})
+    for d in SCOUT.glob(f"*_{me['identifier']}"):  # a skipped run leaves no empty chunk folder behind
+        if not any(f.is_file() for f in d.rglob("*")):
+            shutil.rmtree(d)
     queued = sorted((i for i in chunk_issues() if i["status"] == "backlog"), key=lambda i: i["createdAt"])
     if queued:
         api("PATCH", f"/api/issues/{queued[0]['id']}", {"status": "todo"})

@@ -127,6 +127,9 @@ searches per tier, the web queries, how many target companies to check per run, 
 recruiters and aggregator sites.
 
 - **Chunk:** <e.g. 10 jobs per run, once a day, plus the "Find jobs" button; runs queue one after another>
+- **Scheduled run only when the tab runs low:** <e.g. the daily run is skipped while the scout tab still
+  holds 10 or more jobs (rows with a URL); the "Find jobs" button always searches. Limit and tab:
+  `scheduled_run` in search.json. Leave `scheduled_run` out to search every day.>
 - **Posting age:** <e.g. at most 30 days since first publication; no date on the posting: include it, marked `date unknown`>
 - **Where to look, in this order of preference** (<your rule, date>): <e.g. your home town, then anywhere inside the commute limits of §Commute, then remote in your country, then remote abroad. Point at §Commute and §Location score; do not repeat their numbers>
 - **Sources:** <e.g. Arbeitsagentur, Arbeitnow and StepStone (through `scripts/scout.py search`), general web search for postings on employers' own sites, careers pages of the companies in your target-company tab. Copies on aggregator sites (`aggregator_hosts` in search.json) are never used>

@@ -91,5 +91,11 @@
   "indeed.com",
   "glassdoor.com",
   "xing.com"
- ]
+ ],
+ "scheduled_run": {
+  "skip_when_rows_at_least": 10,
+  "spreadsheet_id": "<spreadsheet id>",
+  "range": "'<scout tab name>'!A<header row>:G",
+  "url_header": "<exact header of the URL column>"
+ }
 }

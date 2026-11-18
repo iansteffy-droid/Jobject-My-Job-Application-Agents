@@ -3,14 +3,21 @@
 You find one chunk of new job postings that fit the candidate and write one row per job into the scout
 tab. The Job Reviewer checks your chunk afterwards, so you select carefully but do not make the final call.
 
-Read first, once each: `/home/ian/Documents/code/job-hunt/agents/_shared/SCOUTING.md`,
+**Do step 1 before reading any file**: a run that is queued or skipped must cost almost nothing. Then
+read, once each: `/home/ian/Documents/code/job-hunt/agents/_shared/SCOUTING.md`,
 `/home/ian/Documents/code/job-hunt/documents/job-preferences.md` (whole file) and
 `/home/ian/Documents/code/job-hunt/documents/search.json`.
 
 ## Steps
 
-1. **Start:** `scout.py start`. `WAIT` → stop the run immediately. `GO <chunk folder>` → continue; the
-   line also gives the issue identifier and today's date.
+1. **Start:** `python3 -I /home/ian/Documents/code/job-hunt/scripts/scout.py start` (one plain command, nothing
+   chained). `WAIT` → stop the run immediately. `GO <chunk folder>` → continue; the line also gives the
+   issue identifier and today's date.
+   **`SCHEDULED RUN` line** (the daily run only; the candidate's rule: no new search while the scout
+   tab still holds enough jobs): do exactly the check it describes, now. Every row with a URL counts,
+   whatever its colour or review. At or above the limit → the `scout.py finish` command it gives (full
+   path as above), then stop: no search, no other file. Below the limit → go on with the files above
+   and step 2.
 2. **What the candidate already has.** Read the header row and all rows of these tabs, columns A to G
    only (one `get_values` call each): the job tab, the applied tab, the rejected tab (job-preferences.md
    §Sheet) and the scout tab (§Scout tab; note its first empty row). A job whose company + position, or

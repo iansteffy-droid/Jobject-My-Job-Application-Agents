@@ -110,7 +110,7 @@ Rules live in `agents/_shared/WORKFLOW.md` (process) and `agents/_shared/SHEET.m
 
 ```mermaid
 flowchart TD
-    trig["Daily schedule, or<br/>the Find jobs button"] --> q{"Older chunk still<br/>scouted or reviewed?"}
+    trig["Every morning (skipped while the<br/>scout tab still holds enough jobs),<br/>or the Find jobs button"] --> q{"Older chunk still<br/>scouted or reviewed?"}
     q -- yes --> wait["queued until it is finished"] --> scout
     q -- no --> scout["Job Scout<br/>finds up to one chunk of new jobs,<br/>writes one row each in the scout tab"]
     scout --> rev["Job Reviewer<br/>checks each job: open and recent,<br/>commute, target work, level;<br/>PASS / UNSURE / FAIL and match level"]
