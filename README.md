@@ -162,6 +162,7 @@ scripts/provision.sh                   # agents, permissions, sheet-sync routine
 scripts/sync-spreadsheet.sh            # sheet sync now: new rows, fill columns, stages, fit ranking
 scripts/sync-now.sh                    # full refresh now (same as the "Sync now" Dashboard button)
 scripts/find-jobs.sh                   # scout one chunk of new jobs now (same as the "Find jobs" Dashboard button)
+scripts/watch-jobs.sh [JOB-N ...]      # operator: watch jobs until back, restart stuck ones (DRY_RUN=1 to only report)
 plugins/sync-button/build.sh           # build + install the Dashboard buttons plugin ("Sync now", "Find jobs")
 python3 -I scripts/gen-settings.py     # regenerate permission allowlists after changing them
 scripts/switch-claude-account.sh ~/.claude-other   # move all agents to another Claude account
