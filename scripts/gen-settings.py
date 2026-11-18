@@ -15,6 +15,7 @@ Notes from testing (2026-11-13):
   WebFetch / fetch_page.sh, the candidate's documents are pre-extracted in documents/text/.
 """
 import json
+import re
 from pathlib import Path
 
 JH = Path(__file__).resolve().parent.parent
@@ -62,15 +63,27 @@ ROLES = {
 DENY = (bash("git push", "rm -rf")
         + [f"Edit(/{J}/{d}/**)" for d in ("documents", "agents", "scripts", "config", "paperclip")])
 
+# Each agent's model comes from the ROSTER table in scripts/provision.sh (the single source).
+MODELS = dict(re.findall(r"^(?:ROSTER=\")?([a-z-]+)\|[^|]*\|[^|]*\|([^|]+)\|", (JH / "scripts" / "provision.sh").read_text(), re.M))
+
+
+def superpowers_on(model):
+    """~/.claude/MODEL-POLICY.md: superpowers ON for Claude 4.x and older, OFF for the 5 generation and newer.
+    Bare aliases (opus, sonnet, haiku, fable, mythos) resolve to the newest generation, so they count as OFF."""
+    m = re.match(r"claude-[a-z]+-(\d+)", model)
+    return bool(m) and int(m.group(1)) <= 4
+
+
 out = JH / "config" / "claude-settings"
 out.mkdir(parents=True, exist_ok=True)
 for role, allow in ROLES.items():
-    (out / f"{role}.json").write_text(json.dumps(
-        {"permissions": {"allow": allow, "deny": DENY, "defaultMode": "dontAsk"},
-         # The operator's own hooks (RTK command rewriting, superpowers gate) must not run in agent
-         # sessions: RTK rewrites e.g. `cat` to `rtk read`, which then fails the allowlist.
-         "disableAllHooks": True,
-         # Agents run on Claude 5.x (opus/sonnet aliases); superpowers is off on 5.x (~/.claude/MODEL-POLICY.md).
-         # They share the operator's ~/.claude, so switch the plugin off here, for agent sessions only.
-         "enabledPlugins": {"superpowers@claude-plugins-official": False}}, indent=1) + "\n")
-print("wrote", ", ".join(ROLES))
+    settings = {"permissions": {"allow": allow, "deny": DENY, "defaultMode": "dontAsk"},
+                # The operator's own hooks (RTK command rewriting, superpowers gate) must not run in agent
+                # sessions: RTK rewrites e.g. `cat` to `rtk read`, which then fails the allowlist.
+                "disableAllHooks": True}
+    # Agents share the operator's ~/.claude, where superpowers is enabled; with hooks off the model gate
+    # cannot run, so apply the policy here per agent model.
+    if not superpowers_on(MODELS[role]):
+        settings["enabledPlugins"] = {"superpowers@claude-plugins-official": False}
+    (out / f"{role}.json").write_text(json.dumps(settings, indent=1) + "\n")
+print("wrote", ", ".join(f"{r} ({MODELS[r]}, superpowers {'on' if superpowers_on(MODELS[r]) else 'off'})" for r in ROLES))
