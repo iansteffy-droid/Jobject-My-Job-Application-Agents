@@ -171,6 +171,21 @@ scripts/switch-claude-account.sh ~/.claude-other   # move all agents to another 
 Requirements: Node 22 + pnpm (Paperclip), Google Chrome (page fetch, PDF), `pdftotext`/`pdfinfo`,
 the claude.ai Google Sheets connector on the Claude account the agents use.
 
+### Unattended at night
+
+The job search is scheduled for 02:00. Two optional pieces let it run while nobody is at the computer:
+
+```bash
+scripts/install-night-run.sh autostart # systemd user service `job-hunt`: the instance starts by itself (no root)
+scripts/install-night-run.sh wake      # system timer (sudo): wakes the computer from suspend at 01:55, keeps it
+                                       # awake until the chunk is scouted and reviewed, then suspends it again
+scripts/install-night-run.sh remove    # removes both
+```
+
+The computer must be **suspended, not shut down**, and should be on mains power. After the run it is only
+suspended again when the timer woke it and no unlocked desktop session is in use. With the autostart
+service installed, use `systemctl --user start|stop|restart job-hunt`.
+
 ## History
 
 Built 2026-11-11 to 2026-11-13: initial team; permission fixes (API wrapper, no operator hooks in
