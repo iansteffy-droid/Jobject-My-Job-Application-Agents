@@ -7,11 +7,13 @@ Usage: python3 -I scripts/scout.py <command>
   start                    Scout, first step: checks the issue out, queues it behind an older chunk
                            that is still being scouted or reviewed, creates the chunk folder.
                            Prints `GO <chunk folder>` or `WAIT ...` (then stop the run).
-  search                   Job-board APIs (Arbeitsagentur, Arbeitnow) with the searches from
+  search                   Job boards (Arbeitsagentur, Arbeitnow, StepStone) with the searches from
                            documents/search.json: only postings young enough, title filter applied,
-                           already-seen jobs removed. One JSON line per candidate, nearby jobs first.
+                           already-seen jobs removed. One line per candidate: nearby jobs first, and
+                           within a tier direct employers before recruiters.
   check <company> <title> <url>
-                           Prints NEW or SEEN for a job found elsewhere (web search, careers page).
+                           Prints NEW or SEEN for a job found elsewhere (web search, careers page), or
+                           SKIP for a page that is never used (LinkedIn, aggregator copies).
   fetch <n> <url>          Renders the posting, saves it verbatim to <chunk>/postings/<n>.md and
                            prints its text (capped).
   record                   Adds every job in <chunk>/chunk.json to the seen store.
@@ -30,9 +32,11 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 JH = Path(__file__).resolve().parent.parent
@@ -49,6 +53,10 @@ FETCH_PRINT_CHARS = 9000
 BA_API = "https://rest.arbeitsagentur.de/jobboerse/jobsuche-service/pc/v6/jobs"
 BA_DETAIL = "https://www.arbeitsagentur.de/jobsuche/jobdetail/"
 ARBEITNOW_API = "https://www.arbeitnow.com/api/job-board-api"
+STEPSTONE = "https://www.stepstone.de/jobs/"
+# Arbeitsagentur shows this badge on every posting of some large employers, also when their own text
+# only says disabled applicants are welcome or preferred at equal suitability.
+BA_DISABILITY_BADGE = "ausschließlich für schwerbehinderte"
 TODAY = dt.date.today()
 
 
@@ -181,10 +189,80 @@ def search_arbeitnow(cfg, out, errors):
                         "url": j.get("url", ""), "source": "Arbeitnow"})
 
 
+def url_slug(text):
+    for a, b in (("ä", "ae"), ("ö", "oe"), ("ü", "ue"), ("ß", "ss")):
+        text = text.lower().replace(a, b)
+    return re.sub(r"[^a-z0-9]+", "-", text).strip("-")
+
+
+def stepstone_page(url):
+    """The result page embeds its job list as JSON; headless Chrome gets past the script-only shell."""
+    with tempfile.TemporaryDirectory() as profile:
+        raw = subprocess.run(["google-chrome", "--headless=new", "--disable-gpu", "--no-first-run", f"--user-data-dir={profile}",
+                              "--virtual-time-budget=15000", "--timeout=45000", "--dump-dom", url],
+                             capture_output=True, text=True, timeout=90).stdout
+    m = re.search(r'"items":(\[\{"harmonisedId")', raw)
+    if not m:
+        raise ValueError("no job list in the page (blocked, no results or layout changed)")
+    return json.JSONDecoder().raw_decode(raw, m.start(1))[0]
+
+
+def search_stepstone(cfg, out, errors):
+    searches = cfg.get("stepstone_searches", [])
+    if not searches:
+        return
+    days = cfg["max_age_days"]
+    oldest = (TODAY - dt.timedelta(days=days)).isoformat()
+    age = "age_1" if days <= 1 else "age_7" if days <= 7 else "age_30"
+
+    def run(s):
+        url = STEPSTONE + url_slug(s["what"]) + (f"/in-{url_slug(s['where'])}?radius={s.get('radius_km', 20)}&" if s.get("where") else "?")
+        return stepstone_page(url + f"ag={age}" + ("&wfh=1" if s.get("homeoffice_only") else ""))
+
+    places = {tier: [p.lower() for p in names] for tier, names in cfg.get("local_places", {}).items()}
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        futures = [(s, pool.submit(run, s)) for s in searches]
+    for s, f in futures:
+        try:
+            items = f.result()
+        except (ValueError, OSError, subprocess.SubprocessError) as e:
+            errors.append(f"stepstone '{s['what']}': {e}")
+            continue
+        for j in items:
+            posted = (j.get("datePosted") or "")[:10]
+            place = j.get("location", "")
+            # A place search also returns "similar" jobs elsewhere: the tier comes from the job's own location.
+            tier = next((t for t in cfg["tier_order"] if any(n in place.lower() for n in places.get(t, []))),
+                        "remote" if s.get("homeoffice_only") else None)
+            if (posted and posted < oldest) or not tier:
+                continue
+            out.append({"tier": tier, "title": j.get("title", ""), "company": j.get("companyName", ""),
+                        "location": j.get("location", ""), "posted": posted or None,
+                        "homeoffice": "home office" if j.get("workFromHome") not in (None, "0") else None,
+                        "url": (j.get("url") or "").split("?")[0], "source": "StepStone"})
+
+
+def host(url):
+    return urllib.parse.urlsplit(url.strip()).netloc.lower().removeprefix("www.")
+
+
+def is_recruiter(cfg, company, url):
+    """Recruiters, headhunters and staffing agencies (documents/search.json): the candidate prefers
+    postings of the actual employer, so these come last."""
+    low = company.lower()
+
+    def named(n):  # short names as whole words ("yer" must not match "Bayer")
+        n = n.lower()
+        return re.search(rf"(?<![a-zäöüß]){re.escape(n)}(?![a-zäöüß])", low) if len(n) <= 4 else n in low
+    return (any(named(n) for n in cfg.get("recruiter_names", []))
+            or any(host(url).endswith(h) for h in cfg.get("recruiter_hosts", [])))
+
+
 def cmd_search():
     cfg, seen, found, errors = config(), load_seen(), [], []
     search_ba(cfg, found, errors)
     search_arbeitnow(cfg, found, errors)
+    search_stepstone(cfg, found, errors)
     tiers = cfg["tier_order"]  # nearest first: the candidate prefers jobs near home
     keys, result = set(), {t: [] for t in tiers}
     for c in sorted(found, key=lambda c: c["posted"] or "", reverse=True):
@@ -192,12 +270,14 @@ def cmd_search():
         if not c["url"] or key in keys or not title_ok(c["title"], cfg) or is_seen(seen, c["company"], c["title"], c["url"]):
             continue
         keys.add(key)
+        c["recruiter"] = "recruiter" if is_recruiter(cfg, c["company"], c["url"]) else None
         result[c["tier"]].append(c)
     per_tier = cfg.get("search_print_per_tier", 14)
-    print("# tier | posted | company | title | location | home office | source | url")
+    print("# tier | posted | company | title | location | home office | recruiter? | source | url")
     for t in tiers:
+        result[t].sort(key=lambda c: c["recruiter"] is not None)  # stable: direct employers first, newest first within each
         for c in result[t][:per_tier]:
-            print(" | ".join(str(c.get(k) or "-") for k in ("tier", "posted", "company", "title", "location", "homeoffice", "source", "url")))
+            print(" | ".join(str(c.get(k) or "-") for k in ("tier", "posted", "company", "title", "location", "homeoffice", "recruiter", "source", "url")))
     print("# new candidates: " + ", ".join(f"{t} {len(result[t])} (showing {min(len(result[t]), per_tier)})" for t in tiers)
           + f"; max age {cfg['max_age_days']} days; chunk size {cfg['chunk_size']}")
     for e in errors:
@@ -205,7 +285,15 @@ def cmd_search():
 
 
 def cmd_check(company, title, url):
-    print("SEEN" if is_seen(load_seen(), company, title, url) else "NEW")
+    cfg, h = config(), host(url)
+    if h.endswith("linkedin.com"):
+        print("SKIP: LinkedIn is never used. Find the employer's own posting or drop the job.")
+    elif any(h.endswith(a) for a in cfg.get("aggregator_hosts", [])):
+        print(f"SKIP: {h} only copies postings and is often outdated or blocked. Find the employer's own posting or drop the job.")
+    elif is_seen(load_seen(), company, title, url):
+        print("SEEN")
+    else:
+        print("NEW" + (" (recruiter: see the recruiter rule)" if is_recruiter(cfg, company, url) else ""))
 
 
 # ---------- feedback: learn from what the candidate did with scouted rows ----------
@@ -440,6 +528,9 @@ def cmd_fetch(n, url):
     path.write_text(f"{text}\n\n---\nSource: {url}\nFetched: {TODAY.isoformat()} with scripts/fetch_page.sh (headless Chrome), verbatim page text\n", encoding="utf-8")
     print(text[:FETCH_PRINT_CHARS])
     print(f"\n# saved {len(text)} chars to {path}" + (f" (only the first {FETCH_PRINT_CHARS} printed)" if len(text) > FETCH_PRINT_CHARS else ""))
+    if BA_DISABILITY_BADGE in text.lower():
+        print("# note: the Arbeitsagentur badge 'Stelle ausschließlich für schwerbehinderte ...' alone is not a restriction; "
+              "only the employer's own text decides (SCOUTING.md, ground rules).")
 
 
 def cmd_record():

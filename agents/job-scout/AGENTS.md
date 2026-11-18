@@ -29,22 +29,28 @@ Read first, once each: `/home/ian/Documents/code/job-hunt/agents/_shared/SCOUTIN
    5. Read `jobs/scout/learned.md` once (skip if it does not exist yet).
 4. **Search.** Use all three kinds of source in every run, also when the first already gives enough
    candidates (the candidate wants the boards and their target companies covered):
-   - `scout.py search`: candidates from the job-board APIs, nearest tier first, already filtered by age,
-     title and earlier chunks. Columns are in its first line.
+   - `scout.py search`: candidates from the job boards (Arbeitsagentur, Arbeitnow, StepStone), nearest
+     tier first and direct employers before recruiters, already filtered by age, title and earlier
+     chunks. Columns are in its first line. It may take a minute.
    - Exactly `web_searches_per_run` WebSearch calls with queries from `web_queries` (rotate: start
-     after the last ones named in the newest lines of `jobs/scout/log.md`). For StepStone and Indeed results,
-     prefer the employer's own posting when the result names it.
+     after the last ones named in the newest lines of `jobs/scout/log.md`). Use only results on the
+     employer's own site or its application system (Ashby, Greenhouse, Lever, Personio, Recruitee, join.com,
+     Workable, SmartRecruiters); `scout.py check` answers `SKIP` for copies on aggregator sites, which
+     are mostly outdated or blocked.
    - `target_companies_per_run` companies from the target-company tab (§Scout tab), continuing
      after the last one named in `jobs/scout/log.md`: open their careers page (the site URL from the tab,
      else one WebSearch `"<company>" careers jobs`) with `scripts/fetch_page.sh "<url>" 6000` and look for
      matching titles.
    - Every job that did not come from `scout.py search`: `scout.py check "<company>" "<title>" "<url>"`;
-     `SEEN` → drop it.
+     `SEEN` or `SKIP` → drop it (never fetch it).
 5. **Choose** up to `chunk_size` candidates to fetch, in this order of preference:
    1. real target work (§Target work) at the candidate's level (§Role level: senior, lead, architect,
       product owner; no junior or student roles),
-   2. place: the nearest tier first (SCOUTING.md rule 5), then remote in Germany, then remote in the EU,
-   3. the newest posting.
+   2. the actual employer before a recruiter (SCOUTING.md rule 6): candidates marked `recruiter`, and
+      any agency you recognise yourself, come after all suitable direct postings and fill at most
+      `max_recruiter_jobs_per_chunk` places,
+   3. place: the nearest tier first (SCOUTING.md rule 5), then remote in Germany, then remote in the EU,
+   4. the newest posting.
    **learned.md:** a candidate that matches a `Deny` pattern is dropped (not fetched; it goes into
    chunk.json as `skipped: learned deny: <pattern in a few words>`); a `Weak deny` match goes to the end
    of the list. Among otherwise equal candidates prefer those matching an `Accept` pattern. A pattern
@@ -60,6 +66,10 @@ Read first, once each: `/home/ian/Documents/code/job-hunt/agents/_shared/SCOUTIN
    - A far office with weekly onsite days that cannot pass §Commute → `skipped: commute`.
    - The posting matches a `Deny` pattern of learned.md (e.g. a staffing agency only visible on the
      page) → `skipped: learned deny: <pattern>`.
+   - The page shows it is a recruiter posting (SCOUTING.md rule 6) → follow that rule: the client's
+     own posting instead if it can be found; else keep it only inside the limit and with target work as
+     the core duty, otherwise `skipped: recruiter posting (limit reached | target work not core)`.
+   - The Arbeitsagentur disability badge is never a reason to skip (SCOUTING.md rule 7).
    - Otherwise it is `listed`.
    Replace skipped jobs with the next candidates while the fetch limit allows; a smaller chunk is fine.
 7. **chunk.json** (Write tool, into the chunk folder): one entry per job you fetched or dropped after a
@@ -75,7 +85,8 @@ Read first, once each: `/home/ian/Documents/code/job-hunt/agents/_shared/SCOUTIN
    Then `scout.py record`.
 8. **Write the rows:** one `update_values` call for all `listed` jobs, starting at the first empty row
    of the scout tab, with `null` in every column that is not yours. Your columns (§Scout tab):
-   - `[Position]`, `[Company]`, `[URL]` (the page you fetched),
+   - `[Position]`, `[Company]` (a recruiter posting: `<agency> (recruiter; client: <name | not named>)`),
+     `[URL]` (the page you fetched),
    - `[Work mode]` (`Full remote`, `Hybrid, 2 days/week onsite`, `Onsite`, `Remote possible (frequency unclear)`),
      `[Languages]` (`DE C1, EN fluent`, `EN only`, `not specified`), `[Location]` (city; several: `Hamburg / Berlin`),
      all three exactly as the posting says, never guessed,

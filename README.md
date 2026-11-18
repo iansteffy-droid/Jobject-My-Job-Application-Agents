@@ -122,7 +122,7 @@ flowchart TD
 
 | Agent | Job |
 |---|---|
-| Job Scout | one chunk per run (size, posting age, searches: `documents/search.json`): job-board APIs, web search, careers pages of the candidate's target companies; nearest jobs first, never LinkedIn, nothing the candidate already has in a tab |
+| Job Scout | one chunk per run (size, posting age, searches: `documents/search.json`): job boards (Arbeitsagentur, Arbeitnow, StepStone), web search for employers' own postings, careers pages of the candidate's target companies; nearest jobs first, actual employers before recruiters, never LinkedIn or aggregator copies, nothing the candidate already has in a tab |
 | Job Reviewer | independent check of the chunk from the saved postings: still open and recent, commute limit, target work, level, formal requirements; writes verdict, match level, commute and notes |
 
 Built to use few tokens: `scripts/scout.py` does the searching, age and title filtering, duplicate

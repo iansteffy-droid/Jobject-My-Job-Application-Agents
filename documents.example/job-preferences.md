@@ -123,12 +123,17 @@ names the pitch from the job's `salary.md`; without salary.md the sentence is le
 
 Used by the scouting team (Job Scout, Job Reviewer; `agents/_shared/SCOUTING.md`). The machine-readable
 part is `search.json`: chunk size, maximum posting age, title keywords and exclusions, the job-board
-searches per tier, the web queries and how many target companies to check per run.
+searches per tier, the web queries, how many target companies to check per run, and the lists of
+recruiters and aggregator sites.
 
 - **Chunk:** <e.g. 10 jobs per run, once a day, plus the "Find jobs" button; runs queue one after another>
 - **Posting age:** <e.g. at most 30 days since first publication; no date on the posting: include it, marked `date unknown`>
 - **Where to look, in this order of preference** (<your rule, date>): <e.g. your home town, then anywhere inside the commute limits of §Commute, then remote in your country, then remote abroad. Point at §Commute and §Location score; do not repeat their numbers>
-- **Sources:** <e.g. Arbeitsagentur and Arbeitnow (through `scripts/scout.py search`), StepStone and Indeed (web search), general web search, careers pages of the companies in your target-company tab>
+- **Sources:** <e.g. Arbeitsagentur, Arbeitnow and StepStone (through `scripts/scout.py search`), general web search for postings on employers' own sites, careers pages of the companies in your target-company tab. Copies on aggregator sites (`aggregator_hosts` in search.json) are never used>
+- **Recruiters:** <your rule, e.g.: postings of the real employer come before postings of recruiters,
+  headhunters and staffing agencies; at most `max_recruiter_jobs_per_chunk` (search.json) recruiter
+  postings per chunk, always marked `(recruiter; client: ...)` and rated one match level lower. Or: never
+  list recruiter postings (set the limit to 0).> Known agencies: `recruiter_names`, `recruiter_hosts` in search.json.
 - **Never:** LinkedIn (no search, no fetch, no LinkedIn URL in the sheet).
 - **After the review:** the candidate reads the scout tab and moves the rows they want to the job tab
   themselves. The scouting team never writes to the job tab.

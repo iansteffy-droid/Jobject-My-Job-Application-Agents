@@ -66,6 +66,23 @@ Kept for the whole team in `jobs/scout/`:
 5. **Where the candidate prefers to work** (job-preferences.md §Commute and §Location score): first the
    home town or a commute inside the limits there, then remote. A far-away office is only acceptable
    when the onsite days make the commute rule pass (rarely onsite or fully remote).
+6. **Direct employers before recruiters** (job-preferences.md §Search, Recruiters). A *recruiter posting*
+   is one published by a recruitment agency, headhunter, personnel consultancy or staffing / temp agency
+   (Personalberatung, Personaldienstleister, Arbeitnehmerüberlassung) for a client, named or not. A
+   consultancy or service company that hires the candidate into its own team is an employer, not a
+   recruiter. The candidate may be contacted by recruiters but prefers to apply to the actual company:
+   - If the posting names the client, look for the client's own posting (one WebSearch) and use that
+     instead when it exists.
+   - Otherwise a recruiter posting comes last: it is listed only when the chunk has room after all
+     suitable direct postings, at most `max_recruiter_jobs_per_chunk` (search.json) per chunk, and only
+     when the target work is the core duty.
+   - Always mark it: `[Company]` = `<agency> (recruiter; client: <name | not named>)`.
+7. **The Arbeitsagentur disability badge is not a restriction.** Arbeitsagentur pages of some large
+   employers carry the line `Stelle ausschließlich für schwerbehinderte oder ihnen gleichgestellten
+   Menschen` on every posting. It never decides anything on its own: only the employer's own text does.
+   "Welcome", "encouraged" or "preferred at equal suitability" means the job is open to everyone. Never
+   skip or fail a job for the badge; mention it in the review notes only when the employer's text itself
+   restricts the job.
 
 ## The scout tab
 

@@ -54,10 +54,42 @@
   "enabled": true,
   "pages": 3
  },
- "web_searches_per_run": 3,
+ "web_searches_per_run": 2,
  "web_queries": [
-  "site:stepstone.de <role> <your town>",
-  "site:de.indeed.com <role> remote Deutschland"
+  "<role> remote <country> jobs.ashbyhq.com",
+  "<role> <your town> Stellenangebot Karriere"
  ],
- "target_companies_per_run": 3
+ "target_companies_per_run": 3,
+ "stepstone_searches": [
+  {
+   "tier": "home",
+   "what": "<search term>",
+   "where": "<your town>",
+   "radius_km": 30
+  },
+  {
+   "tier": "remote",
+   "what": "<search term>",
+   "homeoffice_only": true
+  }
+ ],
+ "max_recruiter_jobs_per_chunk": 2,
+ "recruiter_names": [
+  "<part of a recruiter's or staffing agency's company name>",
+  "personalberatung",
+  "zeitarbeit",
+  "recruit",
+  "staffing"
+ ],
+ "recruiter_hosts": [
+  "<job-site host that only carries staffing agencies>"
+ ],
+ "aggregator_hosts": [
+  "jobleads.com",
+  "wearedevelopers.com",
+  "builtin.com",
+  "indeed.com",
+  "glassdoor.com",
+  "xing.com"
+ ]
 }

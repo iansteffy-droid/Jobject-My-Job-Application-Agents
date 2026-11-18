@@ -54,6 +54,12 @@ candidate's earlier decisions, SCOUTING.md "Learning from the candidate's decisi
      `onsite frequency unclear`
    - `Scout: Review notes`: one or two sentences about the job itself: what the work is, the main gap,
      any formal requirement.
+   - **Recruiter postings** (SCOUTING.md rule 6): decide from the posting yourself whether a recruiter,
+     headhunter or staffing agency published it, also when the Scout did not mark it. Then `[Company]`
+     must read `<agency> (recruiter; client: <name | not named>)`, the notes start with
+     `Recruiter posting.`, and the match is one level lower than the work alone would earn (`High` →
+     `Medium`, `Medium` → `Low`). It is never a FAIL for that reason: the candidate may still want it.
+   - **The Arbeitsagentur disability badge** never fails a job or makes it UNSURE (SCOUTING.md rule 7).
    - **Corrections:** if a cell the Scout wrote (`[Work mode]`, `[Languages]`, `[Location]`, `[Position]`,
      `[Company]`, `Scout: Posted`) contradicts the posting, write the correct value and say so in the notes.
    FAIL rows stay in the tab with their reason; never clear or delete a row. Red rows (step 2) get `null`
