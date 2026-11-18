@@ -21,7 +21,7 @@ candidate's columns (role names), the exact header text is in the column map (SH
 If a needed header is missing or appears twice, stop and mark nothing; post `Board decision needed:` on
 the sync issue naming the header.
 
-## A. Sheet sync (the "Sync job sheet" routine wakes you hourly)
+## A. Sheet sync (the "Sync job sheet" routine, started by the candidate)
 
 1. Read `'<tab>'!A<H>:AZ` from the sheet (the first row = headers). Also read `'<applied tab>'!A<H>:AZ`
    and `'<rejected tab>'!A<H>:AZ` and build a header map for each (`<rejected tab>` has a different

@@ -16,7 +16,7 @@ your steps are done. A chunk is at most `chunk_size` jobs (`documents/search.jso
 
 ## One chunk = one issue
 
-The "Find jobs" routine (daily, or the candidate's "Find jobs" button) opens one issue per chunk. Chunks
+The "Find jobs" routine (daily at 07:00, or the candidate's "Find jobs" button) opens one issue per chunk. Chunks
 run strictly one after another: a chunk that starts while an older one is still being scouted or
 reviewed is queued by `scout.py start` and released by `scout.py finish` of the older one. Never create
 issues, sub-issues or cards.

@@ -97,7 +97,7 @@ language tag, so they can be sent as they are.
 
 | Agent | Job |
 |---|---|
-| Coordinator | syncs the sheet (hourly 07–22, or the "Sync now" button), opens one issue per job, adds rows from the candidate's URL lists, colours unclear rows yellow, writes results back (plus Location / Languages / Work mode), sorts rows by Fit, asks the candidate for decisions |
+| Coordinator | syncs the sheet when the candidate starts it (scripts/sync-spreadsheet.sh or the "Sync now" button), opens one issue per job, adds rows from the candidate's URL lists, colours unclear rows yellow, writes results back (plus Location / Languages / Work mode), sorts rows by Fit, asks the candidate for decisions |
 | Intake | fetches the posting verbatim, checks it is still open, runs the commute gate (limits per onsite frequency from job-preferences.md) and the target-work gate |
 | Researcher | stability gate (insolvency, restructuring, acute money trouble; layoffs = watch only), salary range + pitch, letter research |
 | Fit Scorer | 0–10 rating with evidence quoted from the posting; role level, location score and bonuses from job-preferences.md |
@@ -158,8 +158,8 @@ paperclip/          copy of the Paperclip server                                
 ```bash
 pnpm dev                               # = scripts/instance.sh start (also: pnpm stop / restart / status / url)
 scripts/instance.sh start              # own instance on :3300 (never touches other Paperclip instances)
-scripts/provision.sh                   # agents, permissions, hourly sheet-sync routine (idempotent)
-scripts/sync-spreadsheet.sh            # sheet sync now: new rows, fill columns, stages, fit ranking (the hourly routine)
+scripts/provision.sh                   # agents, permissions, sheet-sync routine (no schedule), find-jobs daily at 07:00 (idempotent)
+scripts/sync-spreadsheet.sh            # sheet sync now: new rows, fill columns, stages, fit ranking
 scripts/sync-now.sh                    # full refresh now (same as the "Sync now" Dashboard button)
 scripts/find-jobs.sh                   # scout one chunk of new jobs now (same as the "Find jobs" Dashboard button)
 plugins/sync-button/build.sh           # build + install the Dashboard buttons plugin ("Sync now", "Find jobs")
@@ -180,4 +180,4 @@ German letters; folders by sheet row; yellow "waiting for the candidate" cells; 
 salary range + pitch; header-based columns; location preference score. 2026-11-16: commute limit by
 onsite frequency; all personal values moved out of the committed files into the gitignored
 `documents/` (with blank templates in `documents.example/`); scouting team (Job Scout, Job Reviewer)
-with its own sheet tab, a daily run and a "Find jobs" button.
+with its own sheet tab, a daily run at 07:00 and a "Find jobs" button.
