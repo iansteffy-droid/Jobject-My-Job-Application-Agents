@@ -70,5 +70,8 @@
   ],
   "defaultMode": "dontAsk"
  },
- "disableAllHooks": true
+ "disableAllHooks": true,
+ "enabledPlugins": {
+  "superpowers@claude-plugins-official": false
+ }
 }

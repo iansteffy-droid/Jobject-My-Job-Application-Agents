@@ -69,5 +69,8 @@ for role, allow in ROLES.items():
         {"permissions": {"allow": allow, "deny": DENY, "defaultMode": "dontAsk"},
          # The operator's own hooks (RTK command rewriting, superpowers gate) must not run in agent
          # sessions: RTK rewrites e.g. `cat` to `rtk read`, which then fails the allowlist.
-         "disableAllHooks": True}, indent=1) + "\n")
+         "disableAllHooks": True,
+         # Agents run on Claude 5.x (opus/sonnet aliases); superpowers is off on 5.x (~/.claude/MODEL-POLICY.md).
+         # They share the operator's ~/.claude, so switch the plugin off here, for agent sessions only.
+         "enabledPlugins": {"superpowers@claude-plugins-official": False}}, indent=1) + "\n")
 print("wrote", ", ".join(ROLES))
