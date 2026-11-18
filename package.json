@@ -1,0 +1,12 @@
+{
+  "name": "jobject",
+  "private": true,
+  "description": "Job-hunt agent team: shortcuts for the isolated Paperclip instance on :3300",
+  "scripts": {
+    "dev": "scripts/instance.sh start",
+    "stop": "scripts/instance.sh stop",
+    "restart": "scripts/instance.sh restart",
+    "status": "scripts/instance.sh status",
+    "url": "scripts/instance.sh url"
+  }
+}
