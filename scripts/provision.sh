@@ -98,7 +98,7 @@ if [ -z "$fid" ]; then
 else
   echo "routine $FTITLE exists ($fid)"
 fi
-# Find-jobs routine (scouting team, agents/_shared/SCOUTING.md): one chunk a day at 07:00, plus the "Find jobs" Dashboard
+# Find-jobs routine (scouting team, agents/_shared/SCOUTING.md): one chunk a night at 02:00 (scripts/install-night-run.sh wakes the computer for it), plus the "Find jobs" Dashboard
 # button and scripts/find-jobs.sh. always_enqueue: every start opens its own chunk issue; scripts/scout.py
 # (start / finish) makes the chunks run strictly one after another.
 JTITLE="Find jobs"
@@ -108,12 +108,12 @@ if [ -z "$jid" ]; then
   jid="$(req POST "/api/companies/$CID/routines" "$(jq -nc --arg a "$SCOUT" --arg t "$JTITLE" \
     '{title:$t, assigneeAgentId:$a, priority:"low", concurrencyPolicy:"always_enqueue", catchUpPolicy:"skip_missed",
       description:"Scout one chunk of new jobs into the scout tab (Job Scout instructions), then hand it to the Job Reviewer."}')" | jq -r .id)"
-  req POST "/api/routines/$jid/triggers" '{"kind":"schedule","label":"daily","cronExpression":"0 7 * * *","timezone":"Europe/Berlin"}' >/dev/null
+  req POST "/api/routines/$jid/triggers" '{"kind":"schedule","label":"daily","cronExpression":"0 2 * * *","timezone":"Europe/Berlin"}' >/dev/null
   echo "created routine $JTITLE ($jid)"
 else
   echo "routine $JTITLE exists ($jid)"
 fi
 for tid in $(req GET "/api/routines/$jid" | jq -r '.triggers[]? | select(.kind=="schedule") | .id'); do
-  req PATCH "/api/routine-triggers/$tid" '{"label":"daily","cronExpression":"0 7 * * *","timezone":"Europe/Berlin"}' >/dev/null
+  req PATCH "/api/routine-triggers/$tid" '{"label":"daily","cronExpression":"0 2 * * *","timezone":"Europe/Berlin"}' >/dev/null
 done
 echo "company $CID ready: $API"

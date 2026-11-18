@@ -110,7 +110,7 @@ Rules live in `agents/_shared/WORKFLOW.md` (process) and `agents/_shared/SHEET.m
 
 ```mermaid
 flowchart TD
-    trig["Every morning (skipped while the<br/>scout tab still holds enough jobs),<br/>or the Find jobs button"] --> q{"Older chunk still<br/>scouted or reviewed?"}
+    trig["Every night at 02:00 (skipped while the<br/>scout tab still holds enough jobs),<br/>or the Find jobs button"] --> q{"Older chunk still<br/>scouted or reviewed?"}
     q -- yes --> wait["queued until it is finished"] --> scout
     q -- no --> scout["Job Scout<br/>finds up to one chunk of new jobs,<br/>writes one row each in the scout tab"]
     scout --> rev["Job Reviewer<br/>checks each job: open and recent,<br/>commute, target work, level;<br/>PASS / UNSURE / FAIL and match level"]
@@ -158,7 +158,7 @@ paperclip/          copy of the Paperclip server                                
 ```bash
 pnpm dev                               # = scripts/instance.sh start (also: pnpm stop / restart / status / url)
 scripts/instance.sh start              # own instance on :3300 (never touches other Paperclip instances)
-scripts/provision.sh                   # agents, permissions, sheet-sync routine (no schedule), find-jobs daily at 07:00 (idempotent)
+scripts/provision.sh                   # agents, permissions, sheet-sync routine (no schedule), find-jobs nightly at 02:00 (idempotent)
 scripts/sync-spreadsheet.sh            # sheet sync now: new rows, fill columns, stages, fit ranking
 scripts/sync-now.sh                    # full refresh now (same as the "Sync now" Dashboard button)
 scripts/find-jobs.sh                   # scout one chunk of new jobs now (same as the "Find jobs" Dashboard button)
@@ -181,4 +181,4 @@ German letters; folders by sheet row; yellow "waiting for the candidate" cells; 
 salary range + pitch; header-based columns; location preference score. 2026-11-16: commute limit by
 onsite frequency; all personal values moved out of the committed files into the gitignored
 `documents/` (with blank templates in `documents.example/`); scouting team (Job Scout, Job Reviewer)
-with its own sheet tab, a daily run at 07:00 and a "Find jobs" button.
+with its own sheet tab, a nightly run at 02:00 and a "Find jobs" button.
