@@ -29,7 +29,7 @@ fi
 ROSTER="coordinator|Coordinator|pm|sonnet|1200|80
 intake|Intake|researcher|sonnet|900|60
 researcher|Researcher|researcher|sonnet|1200|80
-fit-scorer|Fit Scorer|general|opus|900|50
+fit-scorer|Fit Scorer|general|fable|900|50
 letter-strategist|Letter Strategist|general|opus|900|50
 letter-writer|Letter Writer|general|fable|1200|80
 fact-checker|Fact-checker|qa|opus|900|60
