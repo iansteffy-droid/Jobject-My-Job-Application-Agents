@@ -6,6 +6,7 @@
 #        MAX_KICKS=3   restarts per issue before it is left for the operator
 #        POLL=60       seconds between checks;  MAX_HOURS=8  give up after this long
 #        DRY_RUN=1     only report what would be restarted
+#        (Claude usage limit: no restarts within 15 min of a usage-limit failure; later ones are uncounted probes)
 #        UNTIL=letters an issue counts as back only when it is in_review AND scripts/check_final.sh passes
 #                      (use after accepting "write a letter?" cards: they sit in_review with the Coordinator first)
 #
@@ -37,9 +38,24 @@ echo "$(date +%H:%M) watching: $(echo $JOBS)"
 declare -A kicks
 deadline=$(( $(date +%s) + MAX_HOURS * 3600 ))
 while :; do
-  active="$(curl -sf "$API/companies/$CID/heartbeat-runs?limit=200" | jq -r '.[]
-    | select(.status=="queued" or .status=="running" or .status=="scheduled_retry")
-    | .contextSnapshot.issueId // empty')"
+  runs="$(curl -sf "$API/companies/$CID/heartbeat-runs?limit=200")"
+  active="$(jq -r '.[] | select(.status=="queued" or .status=="running" or .status=="scheduled_retry")
+    | .contextSnapshot.issueId // empty' <<<"$runs")"
+  # Claude usage limit: restarts while it lasts would only burn MAX_KICKS. If the newest finished run failed on
+  # it less than 15 min ago, wait; if longer ago, restart as a probe that does not count against MAX_KICKS.
+  probe=""
+  lim="$(jq -r '[.[] | select(.status=="failed" or .status=="succeeded")] | sort_by(.createdAt) | last
+      | select(.status=="failed" and ((.error // "") | test("usage|spend limit|429"; "i"))) | .createdAt' <<<"$runs")"
+  if [ -n "$lim" ]; then
+    if [ $(( ($(date +%s) - $(date -d "$lim" +%s)) / 60 )) -lt 15 ]; then
+      [ -n "${limited:-}" ] || echo "$(date +%H:%M) Claude usage limit reached: waiting, no restarts until it resets"
+      limited=1
+      [ "$(date +%s)" -ge "$deadline" ] && { echo "$(date +%H:%M) TIMEOUT during usage limit"; exit 1; }
+      sleep "$POLL"; continue
+    fi
+    probe=1
+  fi
+  [ -n "${limited:-}" ] && { echo "$(date +%H:%M) usage limit may be over: restarting as a probe"; limited=""; }
   waiting=0; now=$(date +%s)
   for j in $JOBS; do
     read -r id st ag upd <<<"$(curl -sf "$API/issues/$j" | jq -r '"\(.id) \(.status) \(.assigneeAgentId) \(.updatedAt)"')"
@@ -67,7 +83,8 @@ while :; do
     curl -sf -X POST -H "$J" -d "{\"taskKey\":\"$id\"}" "$API/agents/$ag/runtime-state/reset-session" >/dev/null
     curl -sf -X POST -H "$J" -d "$(jq -nc --arg w "$why" '{body:("Operator restart (" + $w + "). Start fresh from the issue comments. Bash works: if a command was denied, only that form is off; rewrite it as one plain command (WORKFLOW.md), never stop. Continue the work and hand off as usual.")}')" "$API/issues/$id/comments" >/dev/null
     curl -sf -X PATCH -H "$J" -d "{\"assigneeAgentId\":\"$ag\",\"status\":\"todo\"}" "$API/issues/$id" >/dev/null
-    kicks[$j]=$((c+1)); echo "$(date +%H:%M) restarted $j ($why), restart ${kicks[$j]}/$MAX_KICKS"
+    [ -n "$probe" ] || kicks[$j]=$((c+1))
+    echo "$(date +%H:%M) restarted $j ($why)${probe:+ [usage-limit probe, not counted]}, restart ${kicks[$j]:-0}/$MAX_KICKS"
   done
   [ "$waiting" = 0 ] && { echo "$(date +%H:%M) ALL BACK"; exit 0; }
   [ "$(date +%s)" -ge "$deadline" ] && { echo "$(date +%H:%M) TIMEOUT, $waiting still open"; exit 1; }
