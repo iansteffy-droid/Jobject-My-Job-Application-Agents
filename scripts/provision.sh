@@ -57,7 +57,9 @@ while IFS='|' read -r dir name role model timeout turns; do
     echo "updated agent $name ($id)"
   fi
   # One run at a time per agent (the Coordinator shares sheet + body files between runs); no timer heartbeats.
-  req PATCH "/api/agents/$id" '{"runtimeConfig":{"heartbeat":{"enabled":false,"maxConcurrentRuns":1}}}' >/dev/null
+  # Writer and reviewers work on separate job folders, so they take 3 jobs at once (letters were queuing).
+  conc=1; case "$dir" in letter-writer|fact-checker|proofreader) conc=3;; esac
+  req PATCH "/api/agents/$id" "{\"runtimeConfig\":{\"heartbeat\":{\"enabled\":false,\"maxConcurrentRuns\":$conc}}}" >/dev/null
   jq --arg d "$dir" --arg i "$id" '.[$d]=$i' "$TMP/roster.json" > "$TMP/r2" && mv "$TMP/r2" "$TMP/roster.json"
 done <<<"$ROSTER"
 jq . "$TMP/roster.json" > "$JH/agents/_shared/roster.json"
@@ -115,5 +117,21 @@ else
 fi
 for tid in $(req GET "/api/routines/$jid" | jq -r '.triggers[]? | select(.kind=="schedule") | .id'); do
   req PATCH "/api/routine-triggers/$tid" '{"label":"daily","cronExpression":"0 2 * * *","timezone":"Europe/Berlin"}' >/dev/null
+done
+# Daily check routine (Coordinator instructions, section F): the candidate's standing order, every morning at
+# 07:30 (after Find jobs at 02:00; a run missed while the computer slept is caught up): full sheet sync plus letters for Strong/Good fits that have none.
+DTITLE="Daily sheet check"
+did="$(req GET "/api/companies/$CID/routines" | jq -r --arg t "$DTITLE" '.[]|select(.title==$t)|.id' | head -n1)"
+if [ -z "$did" ]; then
+  did="$(req POST "/api/companies/$CID/routines" "$(jq -nc --arg a "$COORD" --arg t "$DTITLE" \
+    '{title:$t, assigneeAgentId:$a, priority:"medium", concurrencyPolicy:"coalesce_if_active", catchUpPolicy:"enqueue_missed_with_cap",
+      description:"Daily check (Coordinator instructions, section F): full sheet sync (section A), then start letters for Strong fit / Good fit rows that have none (max 5 per run), and report."}')" | jq -r .id)"
+  req POST "/api/routines/$did/triggers" '{"kind":"schedule","label":"daily","cronExpression":"30 7 * * *","timezone":"Europe/Berlin"}' >/dev/null
+  echo "created routine $DTITLE ($did)"
+else
+  echo "routine $DTITLE exists ($did)"
+fi
+for tid in $(req GET "/api/routines/$did" | jq -r '.triggers[]? | select(.kind=="schedule") | .id'); do
+  req PATCH "/api/routine-triggers/$tid" '{"label":"daily","cronExpression":"30 7 * * *","timezone":"Europe/Berlin","enabled":true}' >/dev/null
 done
 echo "company $CID ready: $API"

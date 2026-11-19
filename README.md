@@ -158,7 +158,8 @@ paperclip/          copy of the Paperclip server                                
 ```bash
 pnpm dev                               # = scripts/instance.sh start (also: pnpm stop / restart / status / url)
 scripts/instance.sh start              # own instance on :3300 (never touches other Paperclip instances)
-scripts/provision.sh                   # agents, permissions, sheet-sync routine (no schedule), find-jobs nightly at 02:00 (idempotent)
+scripts/provision.sh                   # agents, permissions, sheet-sync routine (no schedule), find-jobs nightly at 02:00,
+                                       # daily sheet check at 07:30 (sync + letters for Strong/Good fits without one) (idempotent)
 scripts/sync-spreadsheet.sh            # sheet sync now: new rows, fill columns, stages, fit ranking
 scripts/sync-now.sh                    # full refresh now (same as the "Sync now" Dashboard button)
 scripts/find-jobs.sh                   # scout one chunk of new jobs now (same as the "Find jobs" Dashboard button)

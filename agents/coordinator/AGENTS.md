@@ -275,6 +275,25 @@ The candidate wants everything checked against their current sheet and documents
 5. Summary comment on the routine issue: sync result, changed documents, re-check issue (if any).
    Then mark it done.
 
+## F. Daily check (the "Daily sheet check" routine, every morning at 07:30)
+
+The candidate's standing order (2026-11-19): every morning, bring the sheet up to date and write the missing
+letters for good jobs without waiting for their "write a letter?" answer.
+1. Run section A completely: new rows, changed rows, empty `[Agent: …]` cells to fill, colours, rows moved to
+   `<applied tab>` / `<rejected tab>`, deleted rows, folders, Fit sort.
+2. **Missing letters.** Re-read the tab. A row qualifies when all hold: `[Agent: Verdict]` is exactly
+   `Strong fit` or `Good fit`; it has an `[Agent: Ticket]`; neither its `[Company]` nor its `[Position]` cell is
+   red or yellow; `[Agent: Stage]` is not `rejected`, `posting closed`, `skipped by <name>`, `stopped by <name>` or
+   `duplicate of JOB-N`; the issue is open and still waits on the "write a letter?" question (no
+   `letter-plan.md` in its folder, `scripts/check_final.sh JOB-N` prints `RESULT: FAIL`). Handle at most **5**
+   qualifying rows per run, highest Fit first (the usage limit is shared); the rest wait for the next morning.
+   For each: the standing order counts as the candidate's yes, so do exactly what section B does for an
+   accepted letter question (`[Agent: Stage]` = `writing letter`, assign to **researcher**, comment
+   "Daily check: standing order, letters for Strong/Good fits; letter research then letter"). The old
+   "write a letter?" card stays open; agents cannot cancel it, and it no longer matters.
+3. Summary comment on the routine issue: the sync result, the letters started (ticket, company, verdict) and
+   the qualifying rows left for tomorrow. Then mark it done.
+
 ## Rules
 
 - Before every sheet write, re-read the header row (columns may have moved), look the row up again by
