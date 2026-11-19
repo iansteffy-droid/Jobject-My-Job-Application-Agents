@@ -84,6 +84,27 @@ Kept for the whole team in `jobs/scout/`:
    skip or fail a job for the badge; mention it in the review notes only when the employer's text itself
    restricts the job.
 
+## Company requests (blue cells, the candidate's rule, 2026-11-19)
+
+The candidate colours a `[Company]` cell in the **job tab** blue when they want the next job search to look
+for jobs at that company (also for a row with only a company name, e.g. "Find something..."). **Blue** (any
+shade): background colour with a missing channel = 0, `mx = max(r,g,b)`, `mn = min(r,g,b)`; blue when
+`b == mx`, `mx - mn >= 0.08` and `max(r,g) - min(r,g) <= 0.5 * (mx - mn)`. Examples: `{r:0.788,g:0.855,b:0.973}`,
+`{r:0.29,g:0.525,b:0.91}`, `{b:1}`. Not blue: white, cyan `{g:1,b:1}`, purple `{r:0.6,b:1}`.
+- Every run (also a scheduled run that stops for a full scout tab) handles each blue company whose entry in
+  `jobs/scout/company-requests.json` is missing or older than 7 days. Search: its careers page (URL from the row
+  or the target-company tab, else one WebSearch `"<company>" careers jobs`, fetched with `scripts/fetch_page.sh
+  "<url>" 6000`) and, if that fails, one WebSearch `"<company>" <title keywords> job`. Take every opening with
+  target work at the candidate's level (§Target work, §Role level) through `scout.py check` and `scout.py fetch`
+  as usual; these fetches come on top of `chunk_size` (at most 3 per company) and the rows go into the scout tab.
+- Record the result in `jobs/scout/company-requests.json` (Write tool; keep the other entries):
+  `{"<company as in the cell>": {"date": "YYYY-MM-DD", "row": <job-tab row>, "found": <n listed>,
+  "result": "<n> found: <titles> | none: <why>"}}`. The why is concrete: `no open positions on the careers page`,
+  `only sales/hardware roles`, `no target work (titles: …)`, `careers page unreachable, no other source`,
+  `only roles already in the sheet`. Name the result in the handoff or finish text (`Company requests: …`).
+- The Coordinator writes the result into the row on its next sync (Coordinator instructions, section A). The
+  Scout never writes the job tab and never changes a colour.
+
 ## The scout tab
 
 Spreadsheet id, tab name, header row and the column map: job-preferences.md **§Scout tab**. Access

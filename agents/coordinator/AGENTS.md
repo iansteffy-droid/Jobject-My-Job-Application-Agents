@@ -52,6 +52,12 @@ the sync issue naming the header.
    `{r:1,g:0.898,b:0.6}`, `{r:1,g:0.949,b:0.8}`. Not yellow: white, orange `{r:1,g:0.6}`. Red wins if both
    rules match. A yellow row is paused: open nothing for it and write nothing to it, whether you or
    the candidate coloured it.
+   **Blue `[Company]` = a company request for the Job Scout** (the candidate's rule, 2026-11-19; colour test in
+   SCOUTING.md §Company requests). Never recolour it and never treat it as yellow or red. Read
+   `jobs/scout/company-requests.json`: for a blue row with an entry newer than `[Agent: Updated]`, write
+   `[Agent: Stage]` = `company search: <n> found` or `company search: none`, `[Agent: Why]` = the entry's result
+   (e.g. "none: no open positions on the careers page (checked 2026-11-20)"), `[Agent: Updated]` = today. A blue row
+   without an entry yet: `[Agent: Stage]` = `company search queued`. Found jobs arrive in the scout tab, not here.
    **Back to white:** for every row whose `[Agent: Stage]` is `needs <name> (yellow)` and whose
    `[Company]` cell is no longer yellow, the candidate has fixed it: write `[Agent: Stage]` = `queued`,
    clear `[Agent: Why]` (`""`), and hand its issue back to **intake** with
@@ -168,10 +174,13 @@ run in this same run, never a bare folder path.
      the next sync after the candidate sets the cell back to white continues the job (section A).
 - **From Fit Scorer:** write `[Agent: Fit (0-10)]`, `[Agent: Verdict]`, `[Agent: Why]`, `[Agent: Commute]`,
   `[Agent: Company stability]`, `[Agent: Gaps]`, `[Agent: Salary range]`, `[Agent: Pitch]` as SHEET.md
-  describes (salary range and pitch from `salary.md`), `[Agent: Stage]` = `waiting for <name>`. In the
-  same write, fill or correct `[Location]`, `[Languages]` and `[Work mode]` from `posting.json`
-  (SHEET.md section "Location, Languages, Work mode"),
-  and list any old value you replaced in your comment. Then ask the candidate:
+  describes (salary range and pitch from `salary.md`). In the same write, fill or correct `[Location]`,
+  `[Languages]` and `[Work mode]` from `posting.json` (SHEET.md section "Location, Languages, Work mode"),
+  and list any old value you replaced in your comment.
+  **Verdict `Strong fit` or `Good fit`: no waiting for the candidate** (their rule, 2026-11-19). In the same write
+  `[Agent: Stage]` = `writing letter`; no card; assign to **researcher** (letter research) with the comment
+  "<verdict>: letter research then letter, no approval needed (candidate's rule)".
+  **Any other verdict** (Check eligibility, Partial fit, Weak fit…): `[Agent: Stage]` = `waiting for <name>`, then ask the candidate:
   `request_confirmation`, title `Write a cover letter for <Company>?`, `prompt` (max 1000 characters):
   score, verdict and the Why sentence; `detailsMarkdown`: the 3 strongest matches, the gaps, any
   eligibility flag and the path of fit.md (never mention the candidate's own score); `acceptLabel` `Yes, write it`,
@@ -188,7 +197,11 @@ run in this same run, never a bare folder path.
   no placeholder, the company named, and prints each PDF's addressee and subject: compare those with
   posting.json `company`/`title` (WORKFLOW.md identity check). `RESULT: FAIL`, a mismatch or a company-named
   file → assign back to **letter-writer** with the list, no card. Never override a FAIL with your own
-  reasoning (an English posting still needs the German letters when §Letters asks for both languages). Then `ask_user_questions`, one single-choice question
+  reasoning (an English posting still needs the German letters when §Letters asks for both languages).
+  **Verdict `Strong fit` or `Good fit`:** no card. `[Agent: Stage]` = `letter ready`, `[Agent: Letter]` = the German `.pdf`
+  relative to `final/` (e.g. `Product-Engineer/<Firstname>-<Lastname>-Anschreiben.pdf`), comment with company +
+  position + ticket and the PDF paths, issue `done`. The candidate reads the letters and comments if something
+  should change. **Other verdicts:** `ask_user_questions`, one single-choice question
   "Use this letter?" (one letter per job, its angle named after the role in letter-plan.md `Folder: <Name>`),
   options `Use it`, `Revise`, `Neither`; in the summary one line on how it presents the candidate and the PDF
   paths (`final/<Name>/`: `<Firstname>-<Lastname>-Anschreiben` = German, `<Firstname>-<Lastname>-Cover-Letter` =

@@ -60,7 +60,7 @@ flowchart TD
     gate2 -- yes --> reject
     gate2 -- no --> fit["Fit Scorer<br/>0–10 with quoted evidence"]
     fit --> coord2["Coordinator<br/>writes the sheet, sorts by Fit"]
-    coord2 --> dec1{"Decision 1, candidate:<br/>write a letter?"}
+    coord2 --> dec1{"Decision 1, candidate:<br/>write a letter?<br/>(Strong/Good fit: skipped, letter starts)"}
     dec1 -- no --> closed["closed"]
     dec1 -- yes --> lres["Researcher<br/>letter research"]
     lres --> strat["Letter Strategist<br/>plan with one angle<br/>matched to the role"]

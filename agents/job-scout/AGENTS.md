@@ -15,8 +15,9 @@ read, once each: `/home/ian/Documents/code/job-hunt/agents/_shared/SCOUTING.md`,
    issue identifier and today's date.
    **`SCHEDULED RUN` line** (the daily run only; the candidate's rule: no new search while the scout
    tab still holds enough jobs): do exactly the check it describes, now. Every row with a URL counts,
-   whatever its colour or review. At or above the limit → the `scout.py finish` command it gives (full
-   path as above), then stop: no search, no other file. Below the limit → go on with the files above
+   whatever its colour or review. At or above the limit → first the company requests only (step 4a; read
+   SCOUTING.md §Company requests and the job tab's `[Company]` colours for that), then the `scout.py finish`
+   command it gives (full path as above), with `Company requests: …` in its text; no other search. Below the limit → go on with the files above
    and step 2.
 2. **What the candidate already has.** Read the header row and all rows of these tabs, columns A to G
    only (one `get_values` call each): the job tab, the applied tab, the rejected tab (job-preferences.md
@@ -25,7 +26,10 @@ read, once each: `/home/ian/Documents/code/job-hunt/agents/_shared/SCOUTING.md`,
 3. **Learn from the candidate's decisions** (SCOUTING.md, Learning from the candidate's decisions), before
    any search:
    1. Read the scout tab's background colours with one `get_spreadsheet` call (range, fields and row
-      numbering there). Note every row with a cell that is neither white nor empty.
+      numbering there). Note every row with a cell that is neither white nor empty. In the same call add the
+      job tab's `[Company]` column (`includeGridData: true`, fields
+      `sheets.data.rowData.values.effectiveFormat.backgroundColor`) and note its **blue** cells (SCOUTING.md
+      §Company requests).
    2. Write `jobs/scout/sheet-now.json` (Write tool) from the four tabs you just read and those colours,
       exactly in the format in SCOUTING.md. Copy values as they are; do not judge here.
    3. `scout.py feedback`. Rows it names under `RED` are the candidate's: never write anything in them.
@@ -34,6 +38,9 @@ read, once each: `/home/ian/Documents/code/job-hunt/agents/_shared/SCOUTING.md`,
       named, at most 15 lines). Look for what the decided jobs share: company type (staffing agency,
       consultancy, product company), work mode, place, level, kind of work, review verdict and match, source.
    5. Read `jobs/scout/learned.md` once (skip if it does not exist yet).
+4a. **Company requests** (SCOUTING.md §Company requests): for each blue job-tab company that is due, search
+   it first, fetch its matching openings (on top of `chunk_size`, at most 3 per company), and record the result
+   in `jobs/scout/company-requests.json`, also when nothing was found (with the reason).
 4. **Search.** Use all three kinds of source in every run, also when the first already gives enough
    candidates (the candidate wants the boards and their target companies covered):
    - `scout.py search`: candidates from the job boards (Arbeitsagentur, Arbeitnow, StepStone), nearest
@@ -102,5 +109,5 @@ read, once each: `/home/ian/Documents/code/job-hunt/agents/_shared/SCOUTING.md`,
    - `Scout: Posted`, `Scout: Found` (today), `Scout: Source`, `Scout: Chunk` (the issue identifier).
 9. **Log:** add one line to `jobs/scout/log.md` (create it if missing; Read it only with `tail -n 3`):
    `<date> <issue>: web queries <numbers used>; target companies <names checked>; listed <n>, skipped <n>`.
-10. **Hand over:** `scout.py handoff "Scouted <n> jobs (<k> near home, <m> remote), skipped <s>. Feedback: <a> accepted, <d> denied, <x> deleted. Learned skips: <pattern> (<k>); none. Chunk folder: <path>"`.
+10. **Hand over:** `scout.py handoff "Scouted <n> jobs (<k> near home, <m> remote), skipped <s>. Company requests: <company>: <n> found | none: <why>; none. Feedback: <a> accepted, <d> denied, <x> deleted. Learned skips: <pattern> (<k>); none. Chunk folder: <path>"`.
    If nothing new was found, close instead: `scout.py finish "No new jobs today: <one reason>"`.
