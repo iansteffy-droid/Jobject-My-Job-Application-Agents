@@ -34,8 +34,8 @@ letter-strategist|Letter Strategist|general|opus|900|50
 letter-writer|Letter Writer|general|opus|1200|80
 fact-checker|Fact-checker|qa|opus|900|60
 proofreader|Proofreader|qa|sonnet|900|50
-job-scout|Job Scout|researcher|sonnet|1800|90
-job-reviewer|Job Reviewer|qa|sonnet|1200|60"
+job-scout|Job Scout|researcher|sonnet|2400|120
+job-reviewer|Job Reviewer|qa|sonnet|1800|90"
 
 agents="$(req GET "/api/companies/$CID/agents")"
 echo '{}' > "$TMP/roster.json"
