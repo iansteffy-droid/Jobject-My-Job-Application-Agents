@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Hand-off check for a job's final letters, in ONE allowed command (agents may not chain commands):
 #   scripts/check_final.sh JOB-7
-# For each angle folder named in letter-plan.md ("Folder A: <name>", "Folder B: <name>") it checks that the
+# For the angle folder named in letter-plan.md ("Folder: <name>"; older plans "Folder A:"/"Folder B:") it checks that the
 # German and English .pdf + .docx exist (names from documents/sender.json), each PDF is 1 page, contains no
 # placeholder, and names the posting's company. Prints the first lines of every PDF (addressee + subject)
 # for the identity check, then "RESULT: PASS" or "RESULT: FAIL" with the reasons. Exit code 0 only on PASS.
@@ -22,8 +22,8 @@ title="$(jq -r '.title // empty' "$dir/posting.json" 2>/dev/null)"
 echo "Job: $t | $company | $title"
 echo "Folder: $dir"
 
-mapfile -t angles < <(grep -oE 'Folder [AB]: *[A-Za-z0-9-]+' "$dir/letter-plan.md" 2>/dev/null | sed -E 's/.*: *//' | awk '!seen[$0]++')
-[ "${#angles[@]}" -eq 2 ] || fails+=("letter-plan.md does not name two folders (Folder A:/Folder B:)")
+mapfile -t angles < <(grep -oE 'Folder( [AB])?: *[A-Za-z0-9-]+' "$dir/letter-plan.md" 2>/dev/null | sed -E 's/.*: *//' | awk '!seen[$0]++')
+[ "${#angles[@]}" -ge 1 ] || fails+=("letter-plan.md names no folder (Folder: <Name>)")
 # Company check uses the first word of the posting's company (e.g. "dmTECH GmbH" -> "dmTECH").
 cword="${company%% *}"
 

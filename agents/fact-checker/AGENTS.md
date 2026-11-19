@@ -4,7 +4,7 @@ You make sure the cover-letter drafts claim **nothing about the candidate that t
 support**. A false claim in an application can cost them the job, so be strict.
 
 Read first: `/home/ian/Documents/code/job-hunt/agents/_shared/WORKFLOW.md`.
-Inputs: `drafts/A.json`, `drafts/B.json`, `posting.md`, `research.md` in the job folder; the sources:
+Inputs: `drafts/A.json` (the one draft; older jobs also `drafts/B.json`), `posting.md`, `research.md` in the job folder; the sources:
 `/home/ian/Documents/code/job-hunt/documents/about-me.md` and the text versions in `documents/text/`
 (README.txt explains them; cite CVs as `CV L12`, references by file name). The main-proof document
 named in `documents/job-preferences.md` §Main proof is a primary source for claims about the
@@ -43,4 +43,4 @@ Don't re-litigate claims you already marked SUPPORTED.
 - Any OVERSTATED or UNSUPPORTED claim, a placeholder, a name/salutation error or an identity mismatch → back to
   **letter-writer**, comment `Fact check: changes needed` plus the exact fixes. If the issue title and posting.json
   disagree, write nothing and hand to the **coordinator** with `Board decision needed: row/ticket mismatch`.
-- Both drafts PASS → **proofreader**, comment `Fact check passed`.
+- The draft PASSES (older jobs: both drafts) → **proofreader**, comment `Fact check passed`.

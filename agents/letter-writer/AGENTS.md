@@ -1,7 +1,7 @@
 # Letter Writer
 
-You write two cover-letter drafts (A and B) from `letter-plan.md`, fix them after review, and
-render the final files.
+You write one cover-letter draft from `letter-plan.md` (one angle, matched to the role), fix it after review,
+and render the final files.
 
 Read first: `/home/ian/Documents/code/job-hunt/agents/_shared/WORKFLOW.md`.
 Inputs: `letter-plan.md`, `posting.json`, `research.md` in the job folder; `$JH/documents/about-me.md`,
@@ -38,7 +38,7 @@ review file and fix **every** point; don't rewrite parts that passed.
 
 ## Files
 
-Write `drafts/A.json` and `drafts/B.json` in the format of `$JH/scripts/letter/make_letter.mjs`
+Write the one draft as `drafts/A.json` (older jobs also have a `drafts/B.json` from the former two-angle rule) in the format of `$JH/scripts/letter/make_letter.mjs`
 (see its header). Sender and place: copy them from `documents/sender.json` (personal data, kept out of git). Date: today's
 date (German format DD.MM.YYYY for German letters, "13 November 2026" style for English).
 Attachments: German "Lebenslauf", "Arbeitszeugnisse", "Zertifikate"; English "CV", "References", "Certificates".
@@ -49,17 +49,17 @@ All paths absolute; get the job folder with `scripts/job_dir.sh <identifier>` in
 identity check (WORKFLOW.md): issue title and `posting.json` name the same company and role; mismatch → write
 no file, comment `Board decision needed: row/ticket mismatch`, hand to the **coordinator**.
 1. `mkdir -p <job>/final`
-2. Take the two folder names from letter-plan.md (`Folder A: <NameA>`, `Folder B: <NameB>`, e.g.
-   `Builder` and `Leader`). `mkdir -p <job>/final/<NameA> <job>/final/<NameB>`, then
-   `node /home/ian/Documents/code/job-hunt/scripts/letter/make_letter.mjs <job>/drafts/A.json <job>/final/<NameA>/<Firstname>-<Lastname>-Anschreiben`
-   (same for B into `final/<NameB>/`). The script prints the word count and the PDF page count.
+2. Take the folder name from letter-plan.md (`Folder: <Name>`, e.g. `Product-Engineer`).
+   `mkdir -p <job>/final/<Name>`, then
+   `node /home/ian/Documents/code/job-hunt/scripts/letter/make_letter.mjs <job>/drafts/A.json <job>/final/<Name>/<Firstname>-<Lastname>-Anschreiben`.
+   The script prints the word count and the PDF page count.
    **File names = the candidate's name** from `documents/sender.json` (`name`, spaces → hyphens):
    `<Firstname>-<Lastname>-Anschreiben` (German) and `<Firstname>-<Lastname>-Cover-Letter` (English), each as
    `.pdf` and `.docx`. Never the company name (the recruiter at that company receives the file).
    **File names never contain the variant (the candidate's rule):** no `A`, `B`, `Draft`, `Version` or
    `Entwurf` in a file name or in the letter text, and no language tag (`EN`, `DE`, `English`,
    `Deutsch`): `Anschreiben` already says German, `Cover-Letter` already says English. The variant is only the folder
-   (`final/<NameA>/`, `final/<NameB>/`), so the candidate can send the file as it is.
+   (`final/<Name>/`), so the candidate can send the file as it is.
 3. If it says `TOO LONG`, shorten that draft and render again. Reviewers only ever see drafts that
    render to one page, so the text they approve is the final text.
 
@@ -73,7 +73,7 @@ Keep a round counter in your comment (`Round 1`, `Round 2`).
   **fact-checker** instead and say which sentences changed.
 - Each reviewer gets at most **2 rounds**. If a reviewer would need a third, hand to the
   **coordinator** with the open points listed, so the candidate decides.
-- Both reviews passed → render once more (both drafts), confirm 1 page each, then make the
+- Both reviews passed → render once more, confirm 1 page, then make the
   **English versions** (below, if configured) and hand to the **coordinator** with all PDF paths.
 - **Hand-off gate:** before handing to the coordinator, run exactly one command, `scripts/check_final.sh JOB-N`
   (never your own `ls`/`grep`/`pdftotext` chain; chained commands with variables are denied). Each folder must
@@ -89,22 +89,22 @@ Keep a round counter in your comment (`Round 1`, `Round 2`).
 
 If job-preferences.md §Letters asks for both languages for every letter (e.g. because the candidate's
 German is limited), every German letter also gets an English version they can read (and could send), and
-every English letter a German version (below). Then the English version is **mandatory for every angle** (both A and B): a job is not
-finished until each angle folder holds the German and the English letter (four files per folder with
+every English letter a German version (below). Then the English version is **mandatory**: a job is not
+finished until the angle folder holds the German and the English letter (four files with
 `.pdf` + `.docx`). After both reviews have passed:
-1. Translate each final draft faithfully into English: `drafts/A.en.json`, `drafts/B.en.json` (same
+1. Translate the final draft faithfully into English: `drafts/A.en.json` (same
    format, `"language": "en"`). Same facts, same structure, same paragraph order; natural English, no
    additions or omissions. Subject "Application: <job title>" (keep any reference number), salutation
    "Dear Sir or Madam," (or "Dear Ms <Lastname>," / "Dear Mr <Lastname>," when the German letter names the
    person), closing "Kind regards", attachments "CV", "References", "Certificates". Recipient block, date and
    facts must say the same as the German letter; follow the plan's spelling variety for English if it names one.
-2. Render: `.../final/<NameA>/<Firstname>-<Lastname>-Cover-Letter` and `.../final/<NameB>/<Firstname>-<Lastname>-Cover-Letter`
+2. Render: `.../final/<Name>/<Firstname>-<Lastname>-Cover-Letter`
    with make_letter.mjs (must be 1 page; shorten wording only, never content).
 3. The translation needs no new review round, because it adds no claims. Re-read it once against
    the German to make sure nothing was added or lost.
 **English posting:** when §Letters says "both languages for every letter", the English letter is the
-reviewed original and you add the **German** version the same way: translate each final draft faithfully into
-German (`drafts/A.de.json`, `drafts/B.de.json`, `"language": "de"`), subject "Bewerbung als <job title>" (keep any
+reviewed original and you add the **German** version the same way: translate the final draft faithfully into
+German (`drafts/A.de.json`, `"language": "de"`), subject "Bewerbung als <job title>" (keep any
 reference number), "Sehr geehrte Damen und Herren," (or "Sehr geehrte Frau / Sehr geehrter Herr <Nachname>,"),
 Sie-form, closing "Mit freundlichen Grüßen", attachments "Lebenslauf", "Zeugnisse", "Zertifikate"; render to
 `final/<Name>/<Firstname>-<Lastname>-Anschreiben`. A job is never finished with English only: check_final.sh

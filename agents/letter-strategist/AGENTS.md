@@ -32,12 +32,13 @@ If `$JH/documents/` contains letters or texts the candidate wrote themselves (jo
    Prefer numbers and results; `documents/about-me.md` (sections 4–5) lists the candidate's strongest proof points.
 4. **Company hook:** one specific thing from research.md that shows genuine interest (no flattery).
 5. **Gaps:** which gaps from fit.md to address briefly and positively, and which to leave out.
-6. **Two angles** for drafts A and B, e.g. A = "builder of production systems", B = "technical
-   leader who ships products". Different openings, same facts. Give each angle a **folder name**:
-   one or two plain words naming how the candidate comes across, Title-Case, joined with a hyphen, e.g.
-   `Builder`, `Leader`, `Consultant`, `Quality-Gates`, `Security-First`; the two must differ. Write
-   them in the plan as `Folder A: <name>` and `Folder B: <name>`. The candidate sees these names instead of
-   "A" and "B" everywhere (folders and the draft choice).
+6. **One angle, matched to the role** (the candidate's rule, 2026-11-19: one letter per job, no second
+   variant). The letter leads with the candidate as exactly what the posting's title asks for: a product
+   engineer role is pitched as a product engineer, a consulting role as a consultant, an architect role as an
+   architect. Never pitch an off-role angle. Folder name = that role in one or two plain words, Title-Case,
+   joined with a hyphen, taken from the posting's title, e.g. `AI-Engineer`, `Product-Engineer`,
+   `Solution-Architect`, `Product-Owner`, `Consultant`, `ML-Engineer`. Write it in the plan as `Folder: <Name>`
+   (one line, no A/B).
 7. **Always** one short sentence on availability (date in `documents/about-me.md`). **Only when the posting asks**:
    salary expectation (the pitch from the job folder's `salary.md`, e.g. "Meine Gehaltsvorstellung liegt bei <pitch> €
    brutto im Jahr."; no salary.md → leave the sentence out), how they found the posting. **Never plan a placeholder**
@@ -48,4 +49,4 @@ If `$JH/documents/` contains letters or texts the candidate wrote themselves (jo
 10. **Avoid:** anything not in the documents; repeating the CV line by line; clichés; jargon an HR
     reader won't know (explain or drop terms like "Shift-Left").
 
-Hand off to **letter-writer** with a two-line summary of both angles.
+Hand off to **letter-writer** with a one-line summary of the angle.

@@ -113,10 +113,10 @@ A stale row number or path once put one company's letter in another company's fo
 | `salary.md` | Researcher | salary range, confidence, pitch |
 | `research.md` | Researcher | deeper research for the letter (after the candidate says go) |
 | `letter-plan.md` | Letter Strategist | argument plan for the letter |
-| `drafts/A.json`, `drafts/B.json` | Letter Writer | two drafts in `make_letter.mjs` format |
+| `drafts/A.json` | Letter Writer | the one draft in `make_letter.mjs` format (older jobs also `B.json`) |
 | `review-facts.md` | Fact-checker | claim-by-claim check |
 | `review-language.md` | Proofreader | language review |
-| `final/<Angle>/` (e.g. `final/Builder/`, `final/Leader/`) | Letter Writer | rendered `.docx` + `.pdf` per angle, folder names from letter-plan.md; files `<Firstname>-<Lastname>-Anschreiben` (German) and `<Firstname>-<Lastname>-Cover-Letter` (English) from documents/sender.json, never the company, A/B or a language tag; both angles need both languages before the draft choice |
+| `final/<Angle>/` (e.g. `final/Product-Engineer/`) | Letter Writer | rendered `.docx` + `.pdf`, folder named after the role in letter-plan.md (`Folder: <Name>`); files `<Firstname>-<Lastname>-Anschreiben` (German) and `<Firstname>-<Lastname>-Cover-Letter` (English) from documents/sender.json, never the company, A/B or a language tag; both languages before the candidate sees it |
 
 ## Pipeline and handoffs
 
@@ -131,11 +131,11 @@ Coordinator (sheet sync opens issue)
       the candidate rejects → Coordinator closes
   → Researcher: deeper research for the letter
   → Letter Strategist: plan
-  → Letter Writer: drafts A + B
+  → Letter Writer: one draft, angle matched to the role
   → Fact-checker: back to Writer if any claim fails
   → Proofreader: back to Writer if language issues
   → Letter Writer: renders final .docx/.pdf
-  → Coordinator: asks the candidate to choose a draft, writes the sheet, closes
+  → Coordinator: asks the candidate "use this letter?", writes the sheet, closes
 ```
 
 **How to hand off:** in the same run, post a comment summarising your result and its file paths,

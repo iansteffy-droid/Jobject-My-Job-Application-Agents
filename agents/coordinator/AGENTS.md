@@ -184,20 +184,20 @@ run in this same run, never a bare folder path.
   do nothing; no sheet write, no letter work.
 - **From Letter Writer with final letters:** first run exactly one command, `scripts/check_final.sh JOB-N`
   (never your own `ls`/`grep`/`pdftotext` chain: chained commands with variables are denied, which stopped
-  this step three times). It checks both angle folders for the German and English `.pdf`/`.docx`, 1 page each,
+  this step three times). It checks the angle folder for the German and English `.pdf`/`.docx`, 1 page each,
   no placeholder, the company named, and prints each PDF's addressee and subject: compare those with
   posting.json `company`/`title` (WORKFLOW.md identity check). `RESULT: FAIL`, a mismatch or a company-named
   file → assign back to **letter-writer** with the list, no card. Never override a FAIL with your own
   reasoning (an English posting still needs the German letters when §Letters asks for both languages). Then `ask_user_questions`, one single-choice question
-  "Which draft do you want?", options named after the two angle folders (from letter-plan.md
-  `Folder A:` / `Folder B:`, e.g. `Builder`, `Leader`; never "Draft A/B"), then `Revise`, `Neither`;
-  in the summary one line per angle saying how it presents the candidate, and all PDF paths (`final/<NameA>/`
-  and `final/<NameB>/`: `<Firstname>-<Lastname>-Anschreiben` = German, `<Firstname>-<Lastname>-Cover-Letter` = its English version) and: "For Revise, type what to
-  change in the free-text field." `continuationPolicy:
+  "Use this letter?" (one letter per job, its angle named after the role in letter-plan.md `Folder: <Name>`),
+  options `Use it`, `Revise`, `Neither`; in the summary one line on how it presents the candidate and the PDF
+  paths (`final/<Name>/`: `<Firstname>-<Lastname>-Anschreiben` = German, `<Firstname>-<Lastname>-Cover-Letter` =
+  its English version) and: "For Revise, type what to change in the free-text field." `continuationPolicy:
   "wake_assignee"`. Set `in_review`, comment `Board decision needed:`.
-  - An angle chosen: `[Agent: Stage]` = `letter ready`, `[Agent: Letter]` = that `.pdf` relative to
-    `final/` (e.g. `Builder/<Firstname>-<Lastname>-Anschreiben.pdf`; it sits in that angle folder with its `.docx`), issue `done`.
-    Older cards may still offer `Draft A` / `Draft B`: A = the plan's `Folder A`, B = `Folder B`.
+  - Use it: `[Agent: Stage]` = `letter ready`, `[Agent: Letter]` = the German `.pdf` relative to
+    `final/` (e.g. `Product-Engineer/<Firstname>-<Lastname>-Anschreiben.pdf`), issue `done`.
+    Older two-angle jobs (`Folder A:` / `Folder B:` in the plan) may still have a "Which draft?" card with the two
+    folder names (or `Draft A` / `Draft B`: A = `Folder A`, B = `Folder B`): the chosen folder's German `.pdf`.
   - Revise: take the candidate's text from the answer's `otherText`. If it is empty, comment
     `Board decision needed: what should change?` and wait for their comment. Then assign to
     **letter-writer** with the candidate's words quoted.

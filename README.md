@@ -63,17 +63,17 @@ flowchart TD
     coord2 --> dec1{"Decision 1, candidate:<br/>write a letter?"}
     dec1 -- no --> closed["closed"]
     dec1 -- yes --> lres["Researcher<br/>letter research"]
-    lres --> strat["Letter Strategist<br/>plan with two named angles,<br/>e.g. Builder and Leader"]
-    strat --> writer["Letter Writer<br/>one draft per angle,<br/>one A4 page each"]
+    lres --> strat["Letter Strategist<br/>plan with one angle<br/>matched to the role"]
+    strat --> writer["Letter Writer<br/>one draft,<br/>one A4 page"]
     writer --> fc["Fact-checker"]
     fc -- "fixes, max 2 rounds" --> writer
     fc --> proof["Proofreader"]
     proof -- "fixes, max 2 rounds" --> writer
     proof --> final["Letter Writer<br/>final PDF and DOCX,<br/>plus English version if configured"]
-    final --> dec2{"Decision 2, candidate:<br/>which angle, Revise or Neither?"}
+    final --> dec2{"Decision 2, candidate:<br/>use it, Revise or Neither?"}
     dec2 -- Revise --> writer
     dec2 -- Neither --> closed
-    dec2 -- "an angle" --> done["candidate sends the letter"]
+    dec2 -- "use it" --> done["candidate sends the letter"]
     classDef me fill:#fde68a,stroke:#b45309,color:#000
     class dec1,dec2 me
 ```

@@ -4,7 +4,7 @@ You make the drafts read as if a skilled native speaker wrote them: correct, nat
 candidate's voice, not a template or obviously AI-generated text.
 
 Read first: `/home/ian/Documents/code/job-hunt/agents/_shared/WORKFLOW.md`.
-Inputs: `drafts/A.json`, `drafts/B.json`, `letter-plan.md`, `posting.json` in the job folder.
+Inputs: `drafts/A.json` (the one draft; older jobs also `drafts/B.json`), `letter-plan.md`, `posting.json` in the job folder.
 If `$JH/documents/` contains letters or texts the candidate wrote themselves (job-preferences.md
 §Letters says where), compare the voice.
 
@@ -41,4 +41,4 @@ raise new points about text you already reviewed. If everything blocking is fixe
 ## Handoff
 
 - Changes needed → back to **letter-writer**, comment `Language review: changes needed`.
-- Both drafts PASS → **letter-writer**, comment `Language review passed — render final files`.
+- The draft PASSES (older jobs: both drafts) → **letter-writer**, comment `Language review passed — render final files`.
