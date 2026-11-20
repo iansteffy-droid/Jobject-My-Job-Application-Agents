@@ -137,6 +137,9 @@ recruiters and aggregator sites.
   headhunters and staffing agencies; at most `max_recruiter_jobs_per_chunk` (search.json) recruiter
   postings per chunk, always marked `(recruiter; client: ...)` and rated one match level lower. Or: never
   list recruiter postings (set the limit to 0).> Known agencies: `recruiter_names`, `recruiter_hosts` in search.json.
+- **Consulting roles:** <your rule, e.g.: no roles that are primarily consulting (the main duty is
+  advising clients), unless the posting is in English and German is not required. Or: consulting roles
+  are fine. Delete this line to have no rule.>
 - **Never:** LinkedIn (no search, no fetch, no LinkedIn URL in the sheet).
 - **After the review:** the candidate reads the scout tab and moves the rows they want to the job tab
   themselves. The scouting team never writes to the job tab.

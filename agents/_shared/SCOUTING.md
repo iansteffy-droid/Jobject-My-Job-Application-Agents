@@ -83,6 +83,11 @@ Kept for the whole team in `jobs/scout/`:
    "Welcome", "encouraged" or "preferred at equal suitability" means the job is open to everyone. Never
    skip or fail a job for the badge; mention it in the review notes only when the employer's text itself
    restricts the job.
+8. **Consulting roles** (job-preferences.md §Search, Consulting roles, when the candidate set that rule):
+   a role is *primarily consulting* when its main duty is advising clients (consultant / Berater titles,
+   client workshops, requirement analysis, pre-sales, solution advice). An engineer at a consultancy
+   whose main duty is building software is not. Whether such a role is allowed, e.g. only in English,
+   is the candidate's rule there; follow it exactly.
 
 ## Company requests (blue cells, the candidate's rule, 2026-11-19)
 

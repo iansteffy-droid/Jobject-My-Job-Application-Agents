@@ -84,6 +84,9 @@ read, once each: `/home/ian/Documents/code/job-hunt/agents/_shared/SCOUTING.md`,
      own posting instead if it can be found; else keep it only inside the limit and with target work as
      the core duty, otherwise `skipped: recruiter posting (limit reached | target work not core)`.
    - The Arbeitsagentur disability badge is never a reason to skip (SCOUTING.md rule 7).
+   - A primarily consulting role that the candidate's consulting rule excludes (SCOUTING.md rule 8,
+     e.g. one in German) → `skipped: consulting role (<why, e.g. German>)`. Unsure whether it is mostly
+     consulting → list it; the Reviewer decides.
    - Otherwise it is `listed`.
    Replace skipped jobs with the next candidates while the fetch limit allows; a smaller chunk is fine.
 7. **chunk.json** (Write tool, into the chunk folder): one entry per job you fetched or dropped after a

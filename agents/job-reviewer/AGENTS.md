@@ -31,6 +31,9 @@ candidate's earlier decisions, SCOUTING.md "Learning from the candidate's decisi
    4. **Level and formal requirements:** a junior, student or trainee role fails. A hard formal
       requirement the CV does not meet (a citizenship, security clearance, mandatory degree or licence,
       a language level above the candidate's) is `UNSURE`, never FAIL: the candidate decides.
+   5. **Consulting roles** (SCOUTING.md rule 8): a primarily consulting role that the candidate's
+      consulting rule excludes (e.g. German posting or German required) fails: `FAIL: consulting role
+      (<why>)`. When it is unclear whether consulting is the main duty: `UNSURE: mostly consulting?`.
 4. **Match** for every job that did not fail, from the posting's must-haves against the CV and
    §Role level, §Bonuses: `High` (target work is the core duty and the CV covers the must-haves), `Medium`
    (target work is part of the job, or one or two must-haves are missing), `Low` (title-only target work,
