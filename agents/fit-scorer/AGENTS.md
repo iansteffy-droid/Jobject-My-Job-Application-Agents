@@ -45,11 +45,25 @@ then cap the total at 10.0. The bonuses add up. List each bonus that applies in 
 line. Always report base and bonus separately, using the bonus short names from that table
 (`Base 8.7 + <short name> 1.5 = 10.2 → 10.0`), because the cap hides differences between top jobs.
 
-**Formal eligibility:** if the posting has a hard formal requirement the candidate's documents show
-they do not meet (a citizenship, a mandatory degree or licence, a security clearance), still compute
-the score, but the verdict is **`Check eligibility`** and the Why sentence names the requirement and
-the candidate's documented status. The candidate decides; never treat it as a normal deduction inside
-Requirements match.
+**Formal eligibility** (WORKFLOW.md rules 9 and 10, job-preferences.md §Eligibility): if the posting
+has a hard formal requirement the candidate's documents show they do not meet (a mandatory degree or
+licence, a minimum of years, a citizenship, a security clearance), score the job normally and give
+the verdict by the score as below; never `Check eligibility`, never a deduction inside Requirements
+match. The Why gets one extra sentence: `Eligibility: <requirement, quoted> (documents: <status>).
+May still qualify: <the best honest reason>.` Reasons that count: wording like "or comparable" /
+"oder vergleichbare Qualifikation", documented years of practice standing in for a degree, a
+requirement that sits under nice-to-haves elsewhere in the posting, a requirement that is usual
+boilerplate for the role. Cite the posting line or the CV line. If there is no honest reason, write
+`May still qualify: no reason found in the posting.` List the requirement under gaps as `(formal)`.
+The Arbeitsagentur disability badge is never a requirement (WORKFLOW.md rule 9): ignore it.
+
+**Consulting roles** (job-preferences.md §Search, Consulting roles): if the main duty is advising
+clients (consultant / Berater title, workshops, requirement analysis, pre-sales, solution advice;
+an engineer at a consultancy who mainly builds software does not count) and the candidate's rule
+excludes it (e.g. German posting or German required), the verdict is at most **Partial fit**
+whatever the score, and the Why says `Consulting role in German: excluded by the candidate's
+consulting rule.` Borderline: score normally and say in the Why why it is probably not primarily
+consulting.
 
 **Verdict** (never use the word "Skip"):
 - **≥ 7.5 Strong fit**

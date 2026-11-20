@@ -30,7 +30,9 @@ candidate's earlier decisions, SCOUTING.md "Learning from the candidate's decisi
       job never fails for this; note `<label> in title only` instead.
    4. **Level and formal requirements:** a junior, student or trainee role fails. A hard formal
       requirement the CV does not meet (a citizenship, security clearance, mandatory degree or licence,
-      a language level above the candidate's) is `UNSURE`, never FAIL: the candidate decides.
+      a language level above the candidate's) is `UNSURE`, never FAIL: the candidate decides. The
+      notes then add the best honest reason why it may not exclude them (e.g. "or comparable"
+      wording, years of practice instead of the degree), or `no reason found in the posting`.
    5. **Consulting roles** (SCOUTING.md rule 8): a primarily consulting role that the candidate's
       consulting rule excludes (e.g. German posting or German required) fails: `FAIL: consulting role
       (<why>)`. When it is unclear whether consulting is the main duty: `UNSURE: mostly consulting?`.

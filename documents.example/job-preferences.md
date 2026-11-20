@@ -78,6 +78,13 @@ Exactly these three, and nothing stricter:
 
 Weighted, not dealbreakers: <e.g. salary, company size, sector, exact location>.
 
+## Eligibility
+
+<your rule, e.g.: a formal requirement you do not meet (degree, years, licence) never stops a job: the
+Fit Scorer gives the normal verdict and writes the requirement plus the best honest reason why it may
+not exclude you; you move the row to the rejected tab if you agree. Delete this section to have such
+jobs wait for you instead.>
+
 ## Role level
 
 Row "Role type and level" (weight 15 %) of the Fit Scorer rubric; judge only by what the posting states:
@@ -139,7 +146,8 @@ recruiters and aggregator sites.
   list recruiter postings (set the limit to 0).> Known agencies: `recruiter_names`, `recruiter_hosts` in search.json.
 - **Consulting roles:** <your rule, e.g.: no roles that are primarily consulting (the main duty is
   advising clients), unless the posting is in English and German is not required. Or: consulting roles
-  are fine. Delete this line to have no rule.>
+  are fine. Delete this line to have no rule. Rows you move to the job tab yourself: the Fit Scorer
+  gives an excluded consulting role at most `Partial fit`.>
 - **Never:** LinkedIn (no search, no fetch, no LinkedIn URL in the sheet).
 - **After the review:** the candidate reads the scout tab and moves the rows they want to the job tab
   themselves. The scouting team never writes to the job tab.

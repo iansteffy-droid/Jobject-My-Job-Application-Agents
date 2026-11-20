@@ -8,7 +8,7 @@
 #              sheet and passes those tickets here, because scripts have no sheet access).
 #
 # Accepting the card is the candidate's "yes": the Coordinator then runs the letter pipeline (strategist,
-# writer, fact-checker, proofreader, both languages) and posts the "which draft?" card. The verdict comes from
+# writer, fact-checker, proofreader; one letter per job, German and English). The verdict comes from
 # the Fit Scorer's latest "Fit x/10 — <verdict>:" comment, not from the card text. Nothing is ever submitted.
 # Follow the letters with: UNTIL=letters scripts/watch-jobs.sh <the accepted JOB-Ns>
 set -uo pipefail

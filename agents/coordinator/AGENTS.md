@@ -180,7 +180,8 @@ run in this same run, never a bare folder path.
   **Verdict `Strong fit` or `Good fit`: no waiting for the candidate** (their rule, 2026-11-19). In the same write
   `[Agent: Stage]` = `writing letter`; no card; assign to **researcher** (letter research) with the comment
   "<verdict>: letter research then letter, no approval needed (candidate's rule)".
-  **Any other verdict** (Check eligibility, Partial fit, Weak fit…): `[Agent: Stage]` = `waiting for <name>`, then ask the candidate:
+  An eligibility sentence in the Why (WORKFLOW.md rule 10) changes nothing here: the verdict decides.
+  **Any other verdict** (Partial fit, Weak fit…; `Check eligibility` only on older jobs): `[Agent: Stage]` = `waiting for <name>`, then ask the candidate:
   `request_confirmation`, title `Write a cover letter for <Company>?`, `prompt` (max 1000 characters):
   score, verdict and the Why sentence; `detailsMarkdown`: the 3 strongest matches, the gaps, any
   eligibility flag and the path of fit.md (never mention the candidate's own score); `acceptLabel` `Yes, write it`,

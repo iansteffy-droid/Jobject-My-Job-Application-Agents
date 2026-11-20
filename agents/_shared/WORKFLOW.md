@@ -73,6 +73,16 @@ Always use absolute paths.
 7. **Findings go back to the author, never forward.** A reviewer who finds a problem sends the
    issue back to the agent who made it, with the exact fixes needed.
 8. Keep runs short and cheap. Read only what your step needs.
+9. **The Arbeitsagentur disability badge is not a restriction.** Arbeitsagentur pages of some large
+   employers carry `Stelle ausschließlich für schwerbehinderte oder ihnen gleichgestellten Menschen`
+   on every posting. Only the employer's own text decides: "welcome", "encouraged" or "preferred at
+   equal suitability" means the job is open to everyone. Never reject, flag or score down a job for
+   the badge, and never mention it in a letter.
+10. **Eligibility never stops a job** (job-preferences.md §Eligibility, when the candidate set that
+    rule). A hard formal requirement the candidate's documents don't meet (degree, licence, years,
+    citizenship, clearance) is named, together with the best honest reason why it may not exclude
+    them; the job then goes on like any other. The candidate moves the row to the rejected tab if they
+    agree it does.
 
 ## The job folder
 

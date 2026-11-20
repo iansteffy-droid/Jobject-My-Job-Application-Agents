@@ -73,8 +73,8 @@ the header row (exact text):
 | `Agent: Ticket` | issue identifier, e.g. `JOB-12` |
 | `Agent: Stage` | `queued` · `needs <name> (yellow)` · `waiting for <name>` · `writing letter` · `letter ready` · `rejected` · `posting closed` · `skipped by <name>` · `stopped by <name>` · `duplicate of JOB-N` (same posting as another row; `Agent: Why` says which) |
 | `Agent: Fit (0-10)` | the Fit Scorer's total (capped at 10), one decimal, as a number |
-| `Agent: Verdict` | `Strong fit` · `Good fit` · `Partial fit` · `Weak fit` · `Check eligibility` · `Dealbreaker: commute too long for onsite days` · `Dealbreaker: no <label> work` (label from job-preferences.md §Target work) · `Dealbreaker: unstable company` · `Posting closed` |
-| `Agent: Why` | starts with the score breakdown, e.g. `Base 8.7 + bonus 1.5.` (bonus short names from job-preferences.md §Bonuses) then 1–2 sentences **about the job** (duties, match); for dealbreakers, closed postings and eligibility flags, the evidence |
+| `Agent: Verdict` | `Strong fit` · `Good fit` · `Partial fit` · `Weak fit` · `Check eligibility` (older jobs only; WORKFLOW.md rule 10) · `Dealbreaker: commute too long for onsite days` · `Dealbreaker: no <label> work` (label from job-preferences.md §Target work) · `Dealbreaker: unstable company` · `Posting closed` |
+| `Agent: Why` | starts with the score breakdown, e.g. `Base 8.7 + bonus 1.5.` (bonus short names from job-preferences.md §Bonuses) then 1–2 sentences **about the job** (duties, match); for dealbreakers and closed postings, the evidence; an unmet formal requirement adds `Eligibility: … May still qualify: …` (WORKFLOW.md rule 10) |
 | `Agent: Commute` | e.g. `52 min ÖPNV (Bus 3 > RE > U1) ✓`, `209 min ✗`, `remote`; add `, onsite frequency unclear` when screening says so |
 | `Agent: Company stability` | e.g. `OK: profitable, 2,000 staff` / `RED: insolvency filed 2026-05` |
 | `Agent: Gaps` | must-haves from the posting that the candidate's documents don't cover, e.g. `Java (required), SAP` ; `none` if they cover all |
