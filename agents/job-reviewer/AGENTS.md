@@ -48,7 +48,10 @@ candidate's earlier decisions, SCOUTING.md "Learning from the candidate's decisi
      "quote": "<the deciding posting quote, copied exactly>", "commute": "", "notes": "<same as Scout: Review notes>",
      "row": 12}]
    ```
-   `row` is the job's sheet row, `null` when it has none (step 2).
+   `n` is the job's own `n` from chunk.json (also the number of its `postings/<nn>.md`), never a count
+   of your reviews or of the rows: skipped jobs leave gaps, e.g. reviews `1, 2, 4, 9`. The team's
+   learning matches reviews to jobs by this number. `row` is the job's sheet row, `null` when it has
+   none (step 2).
 6. **Write the sheet:** write the review columns of all your rows in one `update_values` call (the rows
    of one chunk are consecutive; `null` for cells you do not change). Your columns (§Scout tab):
    - `Scout: Review`: `PASS`, `FAIL: <reason in a few words>` or `UNSURE: <what the candidate must decide>`
