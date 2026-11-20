@@ -29,7 +29,11 @@ read, once each: `/home/ian/Documents/code/job-hunt/agents/_shared/SCOUTING.md`,
       numbering there). Note every row with a cell that is neither white nor empty. In the same call add the
       job tab's `[Company]` column (`includeGridData: true`, fields
       `sheets.data.rowData.values.effectiveFormat.backgroundColor`) and note its **blue** cells (SCOUTING.md
-      §Company requests).
+      §Company requests). Range for that column: `'<job tab>'!<col>4:<col>` (from the first data row, never
+      the header row), so the n-th `rowData` entry is sheet row `3 + n`. Take the company name of a blue
+      row from your step 2 read of the job tab (the entry at index `row - header row` there, header = index 0)
+      and check that it is a company, not a header or an empty cell; when unsure, name both neighbours in
+      the handoff instead of guessing. (A one-row slip once searched the wrong company, 2026-11-20.)
    2. Write `jobs/scout/sheet-now.json` (Write tool) from the four tabs you just read and those colours,
       exactly in the format in SCOUTING.md. Copy values as they are; do not judge here.
    3. `scout.py feedback`. Rows it names under `RED` are the candidate's: never write anything in them.
