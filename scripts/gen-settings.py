@@ -39,7 +39,7 @@ SHEETS_UPDATE = ["mcp__claude_ai_Google_Sheets__update_values"]
 SHEETS_WRITE = SHEETS_UPDATE + ["mcp__claude_ai_Google_Sheets__update_spreadsheet"]
 
 BASE = (["Read", "Glob", "Grep", "WebFetch", "WebSearch", f"Edit(/{J}/jobs/**)"]
-        + bash(*script("scripts/pc.sh"), *script("scripts/job_dir.sh"), *script("scripts/check_final.sh"), "jq", "mkdir", "ls", "date", "cat", "head", "tail", "wc", "grep",
+        + bash(*script("scripts/pc.sh"), *script("scripts/job_dir.sh"), *script("scripts/check_final.sh"), *script("scripts/check_postings.sh"), "jq", "mkdir", "ls", "date", "cat", "head", "tail", "wc", "grep",
                "pdftotext", "pdfinfo")
         + SHEETS_READ)
 

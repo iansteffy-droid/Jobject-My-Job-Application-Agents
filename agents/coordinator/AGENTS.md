@@ -143,7 +143,17 @@ the sync issue naming the header.
    next agent yourself instead. A job blocked twice in a row for the same step: post
    `Board decision needed:` on it. Also make `[Agent: Stage]` match the
    issue (a pending draft-choice card = `waiting for <name>`; with a letter agent = `writing letter`).
-9. Close the sync issue with a one-line summary ("opened JOB-14, JOB-15; renamed 1 folder (company text changed); JOB-9 applied; JOB-11 rejected; 12 rows waiting; re-routed JOB-26").
+9. **Posting still online?** (the candidate's rule, 2026-11-23.) Collect the tickets of every row in `<tab>` whose
+   `[Agent: Stage]` is not `posting closed`, `rejected`, `skipped by <name>`, `stopped by <name>`, `duplicate of JOB-N`
+   or `needs <name> (yellow)` and that has a `posting.json` URL, then run exactly one command:
+   `scripts/check_postings.sh JOB-a JOB-b …` (all tickets in one call; it skips jobs checked in the last 2 days).
+   - `CLOSED JOB-N <evidence>`: run the identity check, then write `[Agent: Stage]` = `posting closed`,
+     `[Agent: Verdict]` = `Posting closed`, `[Agent: Why]` = the evidence and today's date (e.g. `HTTP 410 at the
+     employer page (checked 2026-11-23)`), `[Agent: Updated]` = today; set the issue `done` with the same comment.
+     Keep `[Agent: Fit]` and `[Agent: Letter]` as they are; any letter folder stays where it is.
+   - `UNCLEAR JOB-N <reason>`: change nothing; list it in the summary (the candidate may check by hand).
+   - `LIVE` / `SKIP`: nothing to do.
+10. Close the sync issue with a one-line summary ("opened JOB-14, JOB-15; renamed 1 folder (company text changed); JOB-9 applied; JOB-11 rejected; postings closed: JOB-24; unclear: JOB-31; 12 rows waiting; re-routed JOB-26").
 
 ## B. Routing (a job issue is assigned to you)
 

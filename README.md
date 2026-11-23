@@ -164,6 +164,7 @@ scripts/sync-spreadsheet.sh            # sheet sync now: new rows, fill columns,
 scripts/sync-now.sh                    # full refresh now (same as the "Sync now" Dashboard button)
 scripts/find-jobs.sh                   # scout one chunk of new jobs now (same as the "Find jobs" Dashboard button)
 scripts/write-cover-letters.sh [JOB-N ...]  # start letters for every Strong fit waiting on its card, plus the named jobs
+scripts/check_postings.sh JOB-N ...     # is each posting still online? (LIVE / CLOSED / UNCLEAR; run by every sheet sync)
 scripts/watch-jobs.sh [JOB-N ...]      # operator: watch jobs until back, restart stuck ones (DRY_RUN=1 to only report)
 plugins/sync-button/build.sh           # build + install the Dashboard buttons plugin ("Sync now", "Find jobs")
 python3 -I scripts/gen-settings.py     # regenerate permission allowlists after changing them
