@@ -60,10 +60,13 @@ The Arbeitsagentur disability badge is never a requirement (WORKFLOW.md rule 9):
 **Consulting roles** (job-preferences.md §Search, Consulting roles): if the main duty is advising
 clients (consultant / Berater title, workshops, requirement analysis, pre-sales, solution advice;
 an engineer at a consultancy who mainly builds software does not count) and the candidate's rule
-excludes it (e.g. German posting or German required), the verdict is at most **Partial fit**
-whatever the score, and the Why says `Consulting role in German: excluded by the candidate's
-consulting rule.` Borderline: score normally and say in the Why why it is probably not primarily
-consulting.
+excludes it (e.g. German posting or German required), it is a **dealbreaker** (job-preferences.md
+§Dealbreakers), whatever the score: verdict `Dealbreaker: consulting role (<why, e.g. German required>)`,
+the Why gives the evidence (the quoted advisory duties and the language requirement), and you hand
+off with `Dealbreaker: consulting role (<why>): <evidence>` instead of a Fit line. Never a Fit verdict
+(Strong/Good/Partial/Weak) for such a role. Borderline (a title or duty mentions consulting but
+building software is clearly the main duty): score normally and say in the Why why it is not primarily
+consulting, quoting the building duties.
 
 **Verdict** (never use the word "Skip"):
 - **≥ 7.5 Strong fit**

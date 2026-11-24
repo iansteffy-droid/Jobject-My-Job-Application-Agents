@@ -78,7 +78,7 @@ flowchart TD
     class dec1,dec2 me
 ```
 
-The three dealbreakers, and nothing stricter (the values come from `documents/job-preferences.md`):
+The dealbreakers, and nothing stricter (the values come from `documents/job-preferences.md`):
 
 - **Commute:** a limit per onsite frequency (e.g. stricter for 3+ days a week than for 1–2 days,
   none for monthly or remote), measured one way from home (`commute-home.json`), as the faster of
@@ -88,6 +88,8 @@ The three dealbreakers, and nothing stricter (the values come from `documents/jo
   itself doesn't match.
 - **Unstable company:** only on concrete evidence (insolvency, restructuring proceedings, acute money
   trouble). Layoffs alone are a watch flag, not a rejection.
+- **Consulting role** (only if the candidate set a consulting rule): a role whose main duty is advising
+  clients and that the rule excludes (e.g. German required) is rejected whatever its score.
 
 Letters land in `jobs/<company>_<position>/final/<Angle>/`, one folder per angle named after
 how it presents the candidate (e.g. `final/Builder/`, `final/Leader/`), each with

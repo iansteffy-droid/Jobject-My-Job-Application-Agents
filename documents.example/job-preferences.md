@@ -68,13 +68,15 @@ What the candidate's next job must involve. The agents write this as "target wor
 
 ## Dealbreakers
 
-Exactly these three, and nothing stricter:
+Exactly these, and nothing stricter:
 
 1. **Commute too long for the onsite days:** limits in §Commute.
 2. **No real target work** (§Target work), but only when the job title has no title keyword.
 3. **Unstable company:** the Researcher's RED verdict (insolvency, restructuring proceedings,
    acute money trouble). Layoffs alone are a watch flag, not a rejection. <Why it matters to you,
    or a pointer to about-me.md §1.>
+4. **Consulting role excluded by §Search, Consulting roles** (only if you set that rule): verdict
+   `Dealbreaker: consulting role (<why>)`, no letter, no card. Delete this line if you have no consulting rule.
 
 Weighted, not dealbreakers: <e.g. salary, company size, sector, exact location>.
 
@@ -146,8 +148,8 @@ recruiters and aggregator sites.
   list recruiter postings (set the limit to 0).> Known agencies: `recruiter_names`, `recruiter_hosts` in search.json.
 - **Consulting roles:** <your rule, e.g.: no roles that are primarily consulting (the main duty is
   advising clients), unless the posting is in English and German is not required. Or: consulting roles
-  are fine. Delete this line to have no rule. Rows you move to the job tab yourself: the Fit Scorer
-  gives an excluded consulting role at most `Partial fit`.>
+  are fine. Delete this line to have no rule. Rows that reach the job tab anyway: an excluded
+  consulting role is a dealbreaker (§Dealbreakers 4), whatever the score.>
 - **Never:** LinkedIn (no search, no fetch, no LinkedIn URL in the sheet).
 - **After the review:** the candidate reads the scout tab and moves the rows they want to the job tab
   themselves. The scouting team never writes to the job tab.

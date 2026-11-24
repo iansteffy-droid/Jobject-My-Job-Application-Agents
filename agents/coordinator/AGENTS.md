@@ -88,13 +88,15 @@ the sync issue naming the header.
    of budget, cut steps 4–5 (open fewer issues), not this one. (2026-11-24: two runs skipped it, "sort keys
    still valid", and the sheet stayed in the wrong order with scored jobs still holding their 100.x keys.)
    a. Re-read `'<tab>'!A<H>:AZ` and the `[Company]` colours. For every visible row from the first data
-      row down to the last row with any content, compute a sort key (a JSON **number**, never a string):
+      row down to the last row with any content, compute a sort key (a JSON **number**, never a string).
+      The stage, verdict and colour rules (200, 300, 400, 500) win over the Fit number: a rejected,
+      closed, duplicate or `Dealbreaker: …` row goes down even when it has a score.
       - scored (`[Agent: Fit (0-10)]` has a number): `20 - total`, where total is the **uncapped** score
         from fit.md / `[Agent: Why]` ("Base 8.7 + bonus 1.5 = 10.2" → 10.2; if there is no breakdown, use
         the Fit number). Highest fit first; equal 10.0 scores are ordered by their uncapped totals.
       - not scored yet but has a URL in `[URL]` (queued, in progress, or no ticket yet): `100 + row/1000`
       - yellow `[Company]` cell: `200 + row/1000`
-      - `[Agent: Stage]` is `rejected`, `posting closed`, `skipped by <name>`, `stopped by <name>` or `duplicate of JOB-N`: `300 + row/1000`
+      - `[Agent: Verdict]` starts with `Dealbreaker:`, or `[Agent: Stage]` is `rejected`, `posting closed`, `skipped by <name>`, `stopped by <name>` or `duplicate of JOB-N`: `300 + row/1000`
       - red `[Company]` or `[Position]` cell: `400 + row/1000`
       - no URL in `[URL]` (but other content): `500 + row/1000`
       - completely empty row: `9999`
@@ -170,7 +172,8 @@ on a mismatch write nothing and post `Board decision needed: row/ticket mismatch
 "ExampleCorp – Senior Software Engineer (JOB-7)") and give paths only from `scripts/job_dir.sh <identifier>`
 run in this same run, never a bare folder path.
 
-- **Dealbreaker from Intake or Researcher:** write `[Agent: Stage]` = `rejected`, `[Agent: Verdict]` = `Dealbreaker: …`,
+- **Dealbreaker from Intake, Researcher or Fit Scorer** (the Fit Scorer's consulting-role dealbreaker
+  included; never a letter, never a "write a letter?" card): write `[Agent: Stage]` = `rejected`, `[Agent: Verdict]` = `Dealbreaker: …`,
   `[Agent: Why]` = the evidence in one sentence, commute/stability when known, `[Agent: Updated]` = today. Set the issue `done` with a comment.
 - **Posting closed** (from Intake or Researcher, with evidence): `[Agent: Stage]` = `posting closed`,
   `[Agent: Verdict]` = `Posting closed`, `[Agent: Why]` = the evidence in one line (e.g.
