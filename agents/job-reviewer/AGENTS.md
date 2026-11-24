@@ -69,6 +69,8 @@ candidate's earlier decisions, SCOUTING.md "Learning from the candidate's decisi
      must read `<agency> (recruiter; client: <name | not named>)`, the notes start with
      `Recruiter posting.`, and the match is one level lower than the work alone would earn (`High` →
      `Medium`, `Medium` → `Low`). It is never a FAIL for that reason: the candidate may still want it.
+     Exception: when `max_recruiter_jobs_per_chunk` in search.json is `0`, the candidate wants direct
+     employers only: `FAIL: recruiter posting`.
    - **The Arbeitsagentur disability badge** never fails a job or makes it UNSURE (SCOUTING.md rule 7).
    - **Corrections:** if a cell the Scout wrote (`[Work mode]`, `[Languages]`, `[Location]`, `[Position]`,
      `[Company]`, `Scout: Posted`) contradicts the posting, write the correct value and say so in the notes.
