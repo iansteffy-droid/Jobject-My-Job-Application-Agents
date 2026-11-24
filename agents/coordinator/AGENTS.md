@@ -82,6 +82,11 @@ the sync issue naming the header.
      `jobs/<name>/.ticket` (Write tool, content e.g. `JOB-18`).
    - write `[Agent: Ticket]` = identifier, `[Agent: Stage]` = `queued`, `[Agent: Updated]` = today to the row.
 6. **Sort the sheet by Fit** (the candidate's rule; job folders keep their names, row numbers change).
+   **Never skip this step, and never reuse old keys.** It runs on every sync, daily check and full refresh,
+   even when this run opened no issue and you think nothing changed: the Fit Scorer writes scores between
+   syncs without touching `[Agent: Sort key]`, and the candidate inserts rows anywhere. If this run is short
+   of budget, cut steps 4–5 (open fewer issues), not this one. (2026-11-24: two runs skipped it, "sort keys
+   still valid", and the sheet stayed in the wrong order with scored jobs still holding their 100.x keys.)
    a. Re-read `'<tab>'!A<H>:AZ` and the `[Company]` colours. For every visible row from the first data
       row down to the last row with any content, compute a sort key (a JSON **number**, never a string):
       - scored (`[Agent: Fit (0-10)]` has a number): `20 - total`, where total is the **uncapped** score
