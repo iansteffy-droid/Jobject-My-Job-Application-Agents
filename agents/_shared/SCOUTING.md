@@ -84,10 +84,14 @@ Kept for the whole team in `jobs/scout/`:
    skip or fail a job for the badge; mention it in the review notes only when the employer's text itself
    restricts the job.
 8. **Consulting roles** (job-preferences.md §Search, Consulting roles, when the candidate set that rule):
-   a role is *primarily consulting* when its main duty is advising clients (consultant / Berater titles,
-   client workshops, requirement analysis, pre-sales, solution advice). An engineer at a consultancy
-   whose main duty is building software is not. Whether such a role is allowed, e.g. only in English,
-   is the candidate's rule there; follow it exactly.
+   a role is *primarily consulting* only when advising **is** the job: strategy, assessments, discovery
+   and use-case workshops, pre-sales, "trusted advisor", steering others who build, with little or no
+   hands-on building. A role whose main duties are designing and building software or AI is **not**
+   consulting, even when it also works with clients or stakeholders, gathers their requirements or
+   advises them on what is being built; even at a consultancy, with "Consultant" in the title, or with
+   "Beratungskompetenz" / stakeholder skills asked. Judge by the duty list, never by the title or the
+   skills list. Whether a consulting role is allowed, e.g. only in English, is the candidate's rule
+   there; follow it exactly.
 
 ## Company requests (blue cells, the candidate's rule, 2026-11-19)
 

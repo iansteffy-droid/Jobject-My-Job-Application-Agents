@@ -35,7 +35,9 @@ candidate's earlier decisions, SCOUTING.md "Learning from the candidate's decisi
       wording, years of practice instead of the degree), or `no reason found in the posting`.
    5. **Consulting roles** (SCOUTING.md rule 8): a primarily consulting role that the candidate's
       consulting rule excludes (e.g. German posting or German required) fails: `FAIL: consulting role
-      (<why>)`. When it is unclear whether consulting is the main duty: `UNSURE: mostly consulting?`.
+      (<why>)`, quoting the advisory duties. When building is the main duty (SCOUTING.md rule 8), client or
+      stakeholder contact is no reason to flag it. `UNSURE: mostly consulting?` only when the duty list is
+      genuinely split between advising and building.
 4. **Match** for every job that did not fail, from the posting's must-haves against the CV and
    §Role level, §Bonuses: `High` (target work is the core duty and the CV covers the must-haves), `Medium`
    (target work is part of the job, or one or two must-haves are missing), `Low` (title-only target work,

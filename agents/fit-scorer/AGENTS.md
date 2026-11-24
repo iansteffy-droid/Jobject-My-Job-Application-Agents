@@ -57,9 +57,11 @@ boilerplate for the role. Cite the posting line or the CV line. If there is no h
 `May still qualify: no reason found in the posting.` List the requirement under gaps as `(formal)`.
 The Arbeitsagentur disability badge is never a requirement (WORKFLOW.md rule 9): ignore it.
 
-**Consulting roles** (job-preferences.md §Search, Consulting roles): if the main duty is advising
-clients (consultant / Berater title, workshops, requirement analysis, pre-sales, solution advice;
-an engineer at a consultancy who mainly builds software does not count) and the candidate's rule
+**Consulting roles** (job-preferences.md §Search, Consulting roles; definition in SCOUTING.md rule 8):
+only when advising **is** the job (strategy, assessments, discovery workshops, pre-sales, trusted
+advisor, steering others who build, little or no hands-on building). A role whose main duties are
+designing and building software or AI is not consulting, whatever the title, the employer or the
+stakeholder contact; score it normally, no cap, no consulting sentence in the Why. If it is consulting and the candidate's rule
 excludes it (e.g. German posting or German required), it is a **dealbreaker** (job-preferences.md
 §Dealbreakers), whatever the score: verdict `Dealbreaker: consulting role (<why, e.g. German required>)`,
 the Why gives the evidence (the quoted advisory duties and the language requirement), and you hand

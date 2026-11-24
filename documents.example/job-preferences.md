@@ -146,8 +146,8 @@ recruiters and aggregator sites.
   headhunters and staffing agencies; at most `max_recruiter_jobs_per_chunk` (search.json) recruiter
   postings per chunk, always marked `(recruiter; client: ...)` and rated one match level lower. Or: never
   list recruiter postings (set the limit to 0).> Known agencies: `recruiter_names`, `recruiter_hosts` in search.json.
-- **Consulting roles:** <your rule, e.g.: no roles that are primarily consulting (the main duty is
-  advising clients), unless the posting is in English and German is not required. Or: consulting roles
+- **Consulting roles:** <your rule, e.g.: no roles that are primarily consulting (advising is the job,
+  little or no hands-on building; a building role with client or stakeholder contact is not consulting), unless the posting is in English and German is not required. Or: consulting roles
   are fine. Delete this line to have no rule. Rows that reach the job tab anyway: an excluded
   consulting role is a dealbreaker (§Dealbreakers 4), whatever the score.>
 - **Never:** LinkedIn (no search, no fetch, no LinkedIn URL in the sheet).
